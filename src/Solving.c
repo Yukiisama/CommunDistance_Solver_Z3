@@ -21,14 +21,17 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 	return x;
 	}
 
-
-Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
+/**
+* @param numGraph The indice of the graph .
+*/
+Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph,unsigned int numGraph, int pathLength){
 	printf("nodes:\n");
-	Graph graph;
-	for(int i = 0; i<numGraphs;i++)
-		graph = graphs[i];
-	for(int j = 0; j<graph.numNodes;j++) 
-		printf("%d : %s, ",j,graph.nodes[j]);
+	for(int node = 0; node<graph.numNodes;node++){
+		for(int position = 0; position<pathLength-1;position++){ 
+			printf("%d : %s, ",node,graph.nodes[node]);
+			getNodeVariable(ctx, numGraph, position, pathLength, node);
+		}
+	}
 }
 
 /**
@@ -41,5 +44,10 @@ Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph *graphs,unsigned int numGrap
  * @return Z3_ast The formula.
  */
 Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
-	Z3_ast Phi_1 = getIsPathFormula_PHI_1(ctx,graphs,numGraphs,pathLength);
+
+	/**********************************Get Sub_Formulas***************************************/
+	Z3_ast Phi_1[numGraphs];
+	for(int i = 0; i<numGraphs;i++){ 
+		Phi_1[i]= getIsPathFormula_PHI_1(ctx,graphs[i],i,pathLength);
+	}
 }
