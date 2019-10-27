@@ -1,4 +1,8 @@
+#include <Graph.h>
+#include <Parsing.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "Z3Tools.h"
 #include "Solving.h"
 void usage(){
@@ -11,7 +15,7 @@ int main(int argc, char* argv[]){
         usage();
         return 0;
     }
-    ///////////////////////////////////////////////////////////////////////////////
+    /*************************************Init and first test getNodeVariable*****************/
     Z3_context ctx = makeContext();
     printf("Creating the context. Must be destroyed at the end of the program.\n");
 	int number = 1;
@@ -20,7 +24,7 @@ int main(int argc, char* argv[]){
 	int node = 1;
     getNodeVariable(ctx, number, position, k, node);
     Z3_del_context(ctx);
-    /////////////////////////////////////////////////////////////////////////////////
+    /*************************************Draw graphs****************************************/
     int numGraphs = argc-1;
     int pathLength = 2;
     Graph graphs[argc-1];
@@ -29,8 +33,10 @@ int main(int argc, char* argv[]){
         graphs[i] = getGraphFromFile(argv[i+1]);
         printGraph(graphs[i]);
     }
-    getIsPathFormula_PHI_1(ctx,graphs,numGraphs,pathLength);
-    /////////////////////////////////////////////////////////////////////////////////
+    /***************************Exec graphsToPathFormula**************************************/
+    graphsToPathFormula(ctx,graphs,numGraphs,pathLength);
+    
+    /***************************Clear Memory*************************************/
     printf("Context deleted, memory is now clean.\n");
     return 0;
 }

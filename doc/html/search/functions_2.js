@@ -6,5 +6,5 @@ var searchData=
   ['getnodevariable',['getNodeVariable',['../Solving_8h.html#ab7cc93761499ad757a97af20d39e2cad',1,'Solving.c']]],
   ['getsolutionlengthfrommodel',['getSolutionLengthFromModel',['../Solving_8h.html#ac8dbc6ac32b172dad22d8b5bb45cb816',1,'Solving.h']]],
   ['graphstofullformula',['graphsToFullFormula',['../Solving_8h.html#ae8aded1b4a2f57bb85db5e6e2f074471',1,'Solving.h']]],
-  ['graphstopathformula',['graphsToPathFormula',['../Solving_8h.html#adda1df41c9465c0e108f80e81c453a0d',1,'Solving.h']]]
+  ['graphstopathformula',['graphsToPathFormula',['../Solving_8h.html#adda1df41c9465c0e108f80e81c453a0d',1,'Solving.c']]]
 ];

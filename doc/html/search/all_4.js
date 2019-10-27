@@ -8,5 +8,5 @@ var searchData=
   ['graph',['Graph',['../structGraph.html',1,'']]],
   ['graph_2eh',['Graph.h',['../Graph_8h.html',1,'']]],
   ['graphstofullformula',['graphsToFullFormula',['../Solving_8h.html#ae8aded1b4a2f57bb85db5e6e2f074471',1,'Solving.h']]],
-  ['graphstopathformula',['graphsToPathFormula',['../Solving_8h.html#adda1df41c9465c0e108f80e81c453a0d',1,'Solving.h']]]
+  ['graphstopathformula',['graphsToPathFormula',['../Solving_8h.html#adda1df41c9465c0e108f80e81c453a0d',1,'Solving.c']]]
 ];

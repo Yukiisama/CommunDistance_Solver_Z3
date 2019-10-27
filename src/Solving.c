@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "Z3Tools.h"
+#include "Graph.h"
 /**
  * @brief Generates a formula consisting of a variable representing the fact that @p node of graph number @p number is at position @p position of an accepting path.
  * 
@@ -23,7 +24,11 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 
 Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
 	printf("nodes:\n");
-	for(int i = 0; i<graph.numNodes;i++) printf("%d : %s, ",i,graph.nodes[i]);
+	Graph graph;
+	for(int i = 0; i<numGraphs;i++)
+		graph = graphs[i];
+	for(int j = 0; j<graph.numNodes;j++) 
+		printf("%d : %s, ",j,graph.nodes[j]);
 }
 
 /**
