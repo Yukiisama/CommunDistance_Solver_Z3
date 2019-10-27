@@ -49,7 +49,8 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
 
 	/**********************************Get Sub_Formulas***************************************/
 	Z3_ast Phi_1[numGraphs];
-	//for(int i = 0; i<numGraphs;i++){ 
-		Phi_1[0]= getIsPathFormula_PHI_1(ctx,graphs[1],1,pathLength);
-	//}
+	for(int i = 0; i<numGraphs;i++){ 
+		Phi_1[i]= getIsPathFormula_PHI_1(ctx,graphs[i],i,pathLength);
+		if(i!=numGraphs-1) printf("********************Next graph : ********************\n");
+	}
 }
