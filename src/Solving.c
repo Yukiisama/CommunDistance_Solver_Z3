@@ -12,11 +12,19 @@
  */
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node){
 	char s[50];
+	if(number<0 || position<0 || k<0 || node < 0);
+		fprintf(stderr, "getNodeVariable wrong arguments must be positive\n" ); 
 	sprintf(s,"x%d,%d,%d,%d",number,position,k,node);
 	Z3_ast x = mk_bool_var(ctx, s);
 	printf("Variable %s created.\n",Z3_ast_to_string(ctx,x));
 	return x;
 	}
+
+
+Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
+	printf("nodes:\n");
+	for(int i = 0; i<graph.numNodes;i++) printf("%d : %s, ",i,graph.nodes[i]);
+}
 
 /**
  * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of length @p pathLength.
@@ -28,5 +36,5 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
  * @return Z3_ast The formula.
  */
 Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
-	
+	Z3_ast Phi_1 = getIsPathFormula_PHI_1(ctx,graphs,numGraphs,pathLength);
 }
