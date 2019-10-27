@@ -22,8 +22,7 @@ int main(int argc, char* argv[]){
 	int position = 1;
 	int k = 1;
 	int node = 1;
-    getNodeVariable(ctx, number, position, k, node);
-    Z3_del_context(ctx);
+    //getNodeVariable(ctx, number, position, k, node);
     /*************************************Draw graphs****************************************/
     int numGraphs = argc-1;
     int pathLength = 2;
@@ -31,12 +30,13 @@ int main(int argc, char* argv[]){
     for (int i = 0; i < argc-1; ++i) // Il faudra penser à prendre en compte les options etc
     {
         graphs[i] = getGraphFromFile(argv[i+1]);
-        printGraph(graphs[i]);
+        //printGraph(graphs[i]);
     }
     /***************************Exec graphsToPathFormula**************************************/
     graphsToPathFormula(ctx,graphs,numGraphs,pathLength);
     
     /***************************Clear Memory*************************************/
     printf("Context deleted, memory is now clean.\n");
+    Z3_del_context(ctx);
     return 0;
 }
