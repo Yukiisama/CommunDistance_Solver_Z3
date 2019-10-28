@@ -143,6 +143,50 @@ Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph,unsigned int numGraph,
 
 }
 
+/**
+ * @param ctx The solver context.
+ * @param graph The graph
+ * @param numGraph The number of the graph
+ * @param pathLength The length of the path to check.
+ * @return Z3_ast The formula phi 4.
+*  @brief : Differ a little from the formula phi 4 of the rapport but is equivalent , Check if for each vertex u
+* ,u can't be at j-th and e-th position of a simple path of pathlenght
+*/
+
+Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph,unsigned int numGraph, int pathLength){
+	printf("BEGIN PHI 4 \n");
+	Z3_ast clause[1000];
+	int indice_clause = 0;
+	Z3_ast And_clause[1000];
+	int indice_And_clause = 0;
+
+	for(int u = 0; u<graph.numNodes;u++){
+		for(int position1 = 0; position1<=pathLength;position1++){
+			for(int position2 = 0; position2<=pathLength;position2++){
+				if(position1!=position2){
+					Z3_ast xj = getNodeVariable(ctx, numGraph, position1, pathLength, u);
+					Z3_ast xj_1 = getNodeVariable(ctx, numGraph, position2, pathLength, u);
+					Z3_ast negxj = Z3_mk_not(ctx,xj);
+					Z3_ast negxj_1 = Z3_mk_not(ctx,xj_1);
+					Z3_ast anOtherTab[2] = {negxj,negxj_1};
+					clause[indice_clause] = Z3_mk_or(ctx,2,anOtherTab);
+					indice_clause++;
+				}
+			}
+		}
+		And_clause[indice_And_clause] = Z3_mk_and(ctx,indice_clause,clause);
+		//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause[indice_And_clause])); //[DEBUG]
+		indice_And_clause++;
+		indice_clause = 0; 
+	}
+
+	Z3_ast And_final_clause = Z3_mk_and(ctx,indice_And_clause,And_clause);
+	printf("AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause)); //[DEBUG]
+	printf("END PHI 4 \n");
+	return And_final_clause;
+
+}
+
 
 void check_satisfiable(Z3_context ctx,Z3_ast f,const char * str){
 	switch (isFormulaSat(ctx,f))
@@ -181,13 +225,16 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
 	Z3_ast Phi_1[numGraphs];
 	Z3_ast Phi_2[numGraphs];
 	Z3_ast Phi_3[numGraphs];
+	Z3_ast Phi_4[numGraphs];
 	for(int i = 0; i<numGraphs;i++){ 
 		Phi_1[i]= getIsPathFormula_PHI_1(ctx,graphs[i],i,pathLength);
 		Phi_2[i]= getIsPathFormula_PHI_2(ctx,graphs[i],i,pathLength);
 		Phi_3[i]= getIsPathFormula_PHI_3(ctx,graphs[i],i,pathLength);
+		Phi_4[i]= getIsPathFormula_PHI_4(ctx,graphs[i],i,pathLength);
 		if(i!=numGraphs-1) printf("********************Next graph : ********************\n");
 		check_satisfiable(ctx, Phi_1[i] ,"PHI 1");
 		check_satisfiable(ctx, Phi_2[i] ,"PHI 2");
 		check_satisfiable(ctx, Phi_3[i] ,"PHI 3");
+		check_satisfiable(ctx, Phi_4[i] ,"PHI 4");
 	}
 }
