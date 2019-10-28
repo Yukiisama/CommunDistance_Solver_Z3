@@ -188,7 +188,34 @@ Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph,unsigned int numGraph,
 }
 
 
+/**
+ * @param ctx The solver context.
+ * @param graph The graph
+ * @param numGraph The number of the graph
+ * @param pathLength The length of the path to check.
+ * @return Z3_ast The formula phi 4.
+*  @brief : Differ a little from the formula phi 4 of the rapport but is equivalent , Check if the source is the first vertex , and the target the last
+*/
+
+Z3_ast getIsPathFormula_PHI_5(Z3_context ctx, Graph graph,unsigned int numGraph, int pathLength){
+	printf("BEGIN PHI 5 \n");
+	int source,target;
+	for(int u = 0; u<graph.numNodes;u++){
+		if(isSource(graph, u)) source = u;
+		if(isTarget(graph, u)) target = u;
+	}
+	Z3_ast xj_source = getNodeVariable(ctx, numGraph, 0, pathLength, source);
+	Z3_ast xj_target = getNodeVariable(ctx, numGraph, graph.numNodes-1, pathLength, target);
+	Z3_ast tab[2] = {xj_source,xj_target};
+	Z3_ast And_clause = Z3_mk_and(ctx,2,tab);
+	printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause)); //[DEBUG]
+	printf("END PHI 5 \n");
+
+	return And_clause;
+}
+
 void check_satisfiable(Z3_context ctx,Z3_ast f,const char * str){
+	printf("Check Satisfiable for %s\n",str);
 	switch (isFormulaSat(ctx,f))
         {
         case Z3_L_FALSE:
@@ -226,15 +253,21 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
 	Z3_ast Phi_2[numGraphs];
 	Z3_ast Phi_3[numGraphs];
 	Z3_ast Phi_4[numGraphs];
+	Z3_ast Phi_5[numGraphs];
 	for(int i = 0; i<numGraphs;i++){ 
 		Phi_1[i]= getIsPathFormula_PHI_1(ctx,graphs[i],i,pathLength);
 		Phi_2[i]= getIsPathFormula_PHI_2(ctx,graphs[i],i,pathLength);
 		Phi_3[i]= getIsPathFormula_PHI_3(ctx,graphs[i],i,pathLength);
 		Phi_4[i]= getIsPathFormula_PHI_4(ctx,graphs[i],i,pathLength);
+		Phi_5[i]= getIsPathFormula_PHI_5(ctx,graphs[i],i,pathLength);
 		if(i!=numGraphs-1) printf("********************Next graph : ********************\n");
 		check_satisfiable(ctx, Phi_1[i] ,"PHI 1");
 		check_satisfiable(ctx, Phi_2[i] ,"PHI 2");
 		check_satisfiable(ctx, Phi_3[i] ,"PHI 3");
 		check_satisfiable(ctx, Phi_4[i] ,"PHI 4");
+		check_satisfiable(ctx, Phi_5[i] ,"PHI 5");
 	}
+
+	//[TODO]: ITERER SUR LES N GRAPHES AND CONCATENER LES SOUS FORMULES I puis CONCATENER ENSEMBLE 
+	// + Arranger le code un peu 
 }
