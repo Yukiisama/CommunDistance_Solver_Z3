@@ -23,6 +23,9 @@ int main(int argc, char* argv[]){
     Z3_ast easy = Z3_mk_or(ctx,3,anOtherTab);
     printf("We have now: %s\n\n",Z3_ast_to_string(ctx,easy));
 
+    Z3_ast anOtherTaba[2] = {easy,easy};
+    Z3_ast easy2= Z3_mk_or(ctx,2,anOtherTaba);
+     printf(" ici We have now: %s\n\n",Z3_ast_to_string(ctx,easy2));
     Z3_lbool isSat = isFormulaSat(ctx,absurd);
 
         switch (isSat)
