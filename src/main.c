@@ -33,9 +33,21 @@ int main(int argc, char* argv[]){
         //printGraph(graphs[i]);
     }
     /***************************Exec graphsToPathFormula**************************************/
-    graphsToPathFormula(ctx,graphs,numGraphs,pathLength);
+    //Z3_ast Path_formula = graphsToPathFormula(ctx,graphs,numGraphs,pathLength);
+    
     /***************************Exec graphsToFullFormula**************************************/
-    graphsToFullFormula(ctx,graphs,numGraphs);
+    //Z3_ast Full_formula = graphsToFullFormula(ctx,graphs,numGraphs);
+    /***************************Create model and Exec getSolutionLengthFromModel**************************************/
+    for(int i = 0; i<=graphs[0].numNodes; i++){
+        Z3_ast Path_formula = graphsToPathFormula(ctx,graphs,numGraphs,i);
+        if(i==0)printf("No simple valid path of length %d in all graphs  \n",0);
+        /*if(isFormulaSat(ctx,Path_formula)==Z3_L_TRUE){
+            Z3_model model = getModelFromSatFormula(ctx,Path_formula);
+	        printf("Model obtained of len %d for %s:\n",i,Z3_model_to_string(ctx,model));
+        }*/
+    }
+    //getSolutionLengthFromModel(ctx,model,graphs);
+    
     
     /***************************Clear Memory*************************************/
     printf("Context deleted, memory is now clean.\n");
