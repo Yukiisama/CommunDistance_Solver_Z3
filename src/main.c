@@ -18,10 +18,10 @@ int main(int argc, char* argv[]){
     /*************************************Init and first test getNodeVariable*****************/
     Z3_context ctx = makeContext();
     printf("Creating the context. Must be destroyed at the end of the program.\n");
-	int number = 1;
-	int position = 1;
-	int k = 1;
-	int node = 1;
+	//int number = 1;
+	//int position = 1;
+	//int k = 1;
+	//int node = 1;
     //getNodeVariable(ctx, number, position, k, node);
     /*************************************Draw graphs****************************************/
     int numGraphs = argc-1;
@@ -34,6 +34,8 @@ int main(int argc, char* argv[]){
     }
     /***************************Exec graphsToPathFormula**************************************/
     graphsToPathFormula(ctx,graphs,numGraphs,pathLength);
+    /***************************Exec graphsToFullFormula**************************************/
+    graphsToFullFormula(ctx,graphs,numGraphs);
     
     /***************************Clear Memory*************************************/
     printf("Context deleted, memory is now clean.\n");

@@ -228,25 +228,46 @@ Z3_ast Concat_sub_formulas(Z3_context ctx, Graph * graphs,unsigned int i, int pa
 }
 
 void check_satisfiable(Z3_context ctx,Z3_ast f,const char * str, int number){
-	printf("Check Satisfiable for %s number %d \n",str,number);
-	switch (isFormulaSat(ctx,f))
-        {
-        case Z3_L_FALSE:
-            printf("%s number %d is not satisfiable.\n",Z3_ast_to_string(ctx,f),number);
-            break;
+	if(number!=-1){
+		printf("Check Satisfiable for %s \n",str);
+		switch (isFormulaSat(ctx,f))
+			{
+			case Z3_L_FALSE:
+				printf("%s number %d is not satisfiable.\n",Z3_ast_to_string(ctx,f),number);
+				break;
 
-        case Z3_L_UNDEF:
-                printf("We don't know if %s number %d is satisfiable.\n",Z3_ast_to_string(ctx,f),number);
-            break;
+			case Z3_L_UNDEF:
+					printf("We don't know if %s number %d is satisfiable.\n",Z3_ast_to_string(ctx,f),number);
+				break;
 
-        case Z3_L_TRUE:
-                printf("%s \n %s number %d is satisfiable.\n",Z3_ast_to_string(ctx,f),str,number);
-				printf("********************END CHECK SATISFIABLE***************************************\n");
-                //Z3_model model = getModelFromSatFormula(ctx,Phi_1[i]);
-                //printf("Model obtained for %s:\n",Z3_model_to_string(ctx,model));
+			case Z3_L_TRUE:
+					printf("%s \n %s number %d is satisfiable.\n",Z3_ast_to_string(ctx,f),str,number);
+					printf("********************END CHECK SATISFIABLE***************************************\n");
+					//Z3_model model = getModelFromSatFormula(ctx,Phi_1[i]);
+					//printf("Model obtained for %s:\n",Z3_model_to_string(ctx,model));
+					break;
+			}
+	}
+	else{
+		switch (isFormulaSat(ctx,f))
+			{
+			printf("Check Satisfiable for %s number %d \n",str,number);
+			case Z3_L_FALSE:
+				printf("%s is not satisfiable.\n",Z3_ast_to_string(ctx,f));
+				break;
 
-                break;
-        }
+			case Z3_L_UNDEF:
+					printf("We don't know if %s is satisfiable.\n",Z3_ast_to_string(ctx,f),str);
+				break;
+
+			case Z3_L_TRUE:
+					printf("%s \n %s is satisfiable.\n",Z3_ast_to_string(ctx,f),str);
+					printf("********************END CHECK SATISFIABLE***************************************\n");
+					//Z3_model model = getModelFromSatFormula(ctx,Phi_1[i]);
+					//printf("Model obtained for %s:\n",Z3_model_to_string(ctx,model));
+					break;
+			}
+	}
 
 }
 
@@ -260,7 +281,6 @@ void check_satisfiable(Z3_context ctx,Z3_ast f,const char * str, int number){
  * @return Z3_ast The formula.
  */
 Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
-
 	/**********************************Get Sub_Formulas***************************************/
 	Z3_ast Sub_Formulas_Concat[numGraphs];
 	for(int i = 0; i<numGraphs;i++){ 
@@ -270,5 +290,34 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
 	}
 	Z3_ast Allgraph_formula = Z3_mk_and(ctx,numGraphs,Sub_Formulas_Concat); 
 	printf("Allgraph_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Allgraph_formula)); //[DEBUG]
+	return Allgraph_formula;
 	
+}
+
+
+/**
+ * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of common length.
+ * 
+ * @param ctx The solver context.
+ * @param graphs An array of graphs.
+ * @param numGraphs The number of graphs in @p graphs.
+ * @return Z3_ast The formula.
+ */
+Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs){
+	int Min_numberNodesAllgraphs = orderG(graphs[0]);
+	for(int i = 1;i < numGraphs;i++)
+	{
+		if(Min_numberNodesAllgraphs > orderG(graphs[i]))
+			Min_numberNodesAllgraphs = orderG(graphs[i]);
+	}
+	Z3_ast Formulas_for_k_lenght_Concat[Min_numberNodesAllgraphs];
+	for(int pathLength = 1 ; pathLength < Min_numberNodesAllgraphs; pathLength++){
+		//pathLenght-1 Because the case 0 is empty( LenghtPath= 0 impossible) so we fill it 
+		Formulas_for_k_lenght_Concat[pathLength-1] = graphsToPathFormula(ctx,graphs,numGraphs,pathLength);
+	}
+	//Min_numberNodesAllgraphs-1 cause we have started writed to case 0 the formula for LenghtPath = 1
+	Z3_ast Full_formula = Z3_mk_and(ctx,Min_numberNodesAllgraphs-1,Formulas_for_k_lenght_Concat); 
+	printf("Full_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Full_formula)); //[DEBUG]
+	check_satisfiable(ctx, Full_formula ,"FULL FORMULA",-1);
+	return Full_formula;
 }
