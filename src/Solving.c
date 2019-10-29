@@ -18,7 +18,7 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 		
 	sprintf(s,"x%d,%d,%d,%d",number,position,k,node);
 	Z3_ast x = mk_bool_var(ctx, s);
-	printf("Variable %s created.\n",Z3_ast_to_string(ctx,x));
+	//printf("Variable %s created.\n",Z3_ast_to_string(ctx,x));
 	return x;
 	}
 
@@ -214,21 +214,34 @@ Z3_ast getIsPathFormula_PHI_5(Z3_context ctx, Graph graph,unsigned int numGraph,
 	return And_clause;
 }
 
-void check_satisfiable(Z3_context ctx,Z3_ast f,const char * str){
-	printf("Check Satisfiable for %s\n",str);
+Z3_ast Concat_sub_formulas(Z3_context ctx, Graph * graphs,unsigned int i, int pathLength){
+		Z3_ast Phi_1= getIsPathFormula_PHI_1(ctx,graphs[i],i,pathLength);
+		Z3_ast Phi_2= getIsPathFormula_PHI_2(ctx,graphs[i],i,pathLength);
+		Z3_ast Phi_3= getIsPathFormula_PHI_3(ctx,graphs[i],i,pathLength);
+		Z3_ast Phi_4= getIsPathFormula_PHI_4(ctx,graphs[i],i,pathLength);
+		Z3_ast Phi_5= getIsPathFormula_PHI_5(ctx,graphs[i],i,pathLength);
+		Z3_ast tab[5] = {Phi_1,Phi_2,Phi_3,Phi_4,Phi_5};
+		Z3_ast And_sub_formulas = Z3_mk_and(ctx,5,tab);
+		//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_sub_formulas)); //[DEBUG]
+		return And_sub_formulas;
+		
+}
+
+void check_satisfiable(Z3_context ctx,Z3_ast f,const char * str, int number){
+	printf("Check Satisfiable for %s number %d \n",str,number);
 	switch (isFormulaSat(ctx,f))
         {
         case Z3_L_FALSE:
-            printf("%s is not satisfiable.\n",Z3_ast_to_string(ctx,f));
+            printf("%s number %d is not satisfiable.\n",Z3_ast_to_string(ctx,f),number);
             break;
 
         case Z3_L_UNDEF:
-                printf("We don't know if %s is satisfiable.\n",Z3_ast_to_string(ctx,f));
+                printf("We don't know if %s number %d is satisfiable.\n",Z3_ast_to_string(ctx,f),number);
             break;
 
         case Z3_L_TRUE:
-                printf("%s \n %s is satisfiable.\n",Z3_ast_to_string(ctx,f),str);
-				printf("***********************************************************\n");
+                printf("%s \n %s number %d is satisfiable.\n",Z3_ast_to_string(ctx,f),str,number);
+				printf("********************END CHECK SATISFIABLE***************************************\n");
                 //Z3_model model = getModelFromSatFormula(ctx,Phi_1[i]);
                 //printf("Model obtained for %s:\n",Z3_model_to_string(ctx,model));
 
@@ -249,25 +262,13 @@ void check_satisfiable(Z3_context ctx,Z3_ast f,const char * str){
 Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
 
 	/**********************************Get Sub_Formulas***************************************/
-	Z3_ast Phi_1[numGraphs];
-	Z3_ast Phi_2[numGraphs];
-	Z3_ast Phi_3[numGraphs];
-	Z3_ast Phi_4[numGraphs];
-	Z3_ast Phi_5[numGraphs];
+	Z3_ast Sub_Formulas_Concat[numGraphs];
 	for(int i = 0; i<numGraphs;i++){ 
-		Phi_1[i]= getIsPathFormula_PHI_1(ctx,graphs[i],i,pathLength);
-		Phi_2[i]= getIsPathFormula_PHI_2(ctx,graphs[i],i,pathLength);
-		Phi_3[i]= getIsPathFormula_PHI_3(ctx,graphs[i],i,pathLength);
-		Phi_4[i]= getIsPathFormula_PHI_4(ctx,graphs[i],i,pathLength);
-		Phi_5[i]= getIsPathFormula_PHI_5(ctx,graphs[i],i,pathLength);
-		if(i!=numGraphs-1) printf("********************Next graph : ********************\n");
-		check_satisfiable(ctx, Phi_1[i] ,"PHI 1");
-		check_satisfiable(ctx, Phi_2[i] ,"PHI 2");
-		check_satisfiable(ctx, Phi_3[i] ,"PHI 3");
-		check_satisfiable(ctx, Phi_4[i] ,"PHI 4");
-		check_satisfiable(ctx, Phi_5[i] ,"PHI 5");
+		Sub_Formulas_Concat[i] = Concat_sub_formulas(ctx,graphs,i,pathLength);
+		check_satisfiable(ctx, Sub_Formulas_Concat[i] ,"Sub_formulas_concat",i);
+		if(i!=numGraphs-1) printf("*********Graph %d done ***********Next graph : ********************\n",i);
 	}
-
-	//[TODO]: ITERER SUR LES N GRAPHES AND CONCATENER LES SOUS FORMULES I puis CONCATENER ENSEMBLE 
-	// + Arranger le code un peu 
+	Z3_ast Allgraph_formula = Z3_mk_and(ctx,numGraphs,Sub_Formulas_Concat); 
+	printf("Allgraph_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Allgraph_formula)); //[DEBUG]
+	
 }
