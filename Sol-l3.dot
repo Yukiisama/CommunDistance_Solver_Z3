@@ -1,0 +1,4 @@
+digraph Sol-l3.dot
+{
+_0_s1 [initial=1,color=green][style=filled,fillcolor=lightblue];
+_0_t1 [final=1,color=red][style=filled,fillcolor=lightblue];

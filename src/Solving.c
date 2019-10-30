@@ -457,3 +457,45 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
 	}
 
 }
+/**
+ * @brief Creates the file ("%s-l%d.dot",name,pathLength) representing the solution to the problem described by @p model, or ("result-l%d.dot,pathLength") if name is NULL.
+ * 
+ * @param ctx The solver context.
+ * @param model A variable assignment.
+ * @param graphs An array of graphs.
+ * @param numGraph The number of graphs in @p graphs.
+ * @param pathLength The length of path.
+ * @param name The name of the output file.
+ */
+void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength, char* name){
+	char title[1000];
+	sprintf(title, "%s-l%d.dot",name,pathLength);
+	FILE * file;
+	file = fopen(title, "w");
+	if(file == NULL)
+    {
+        printf("Unable to create file.\n");
+        //exit(EXIT_FAILURE);
+    }
+	int source, target;
+	//PENSER A ITERAL SUR CHAQUE GRAPH
+	int numgraph_actual = 0;
+	for (int u = 0; u < graphs[numgraph_actual].numNodes; u++)
+	{
+		if (isSource(graphs[numgraph_actual], u))
+			source = u;
+		if (isTarget(graphs[numgraph_actual], u))
+			target = u;
+	}
+	char * source_str = getNodeName(graphs[numgraph_actual],source);
+	char * target_str = getNodeName(graphs[numgraph_actual],target);
+	fprintf(file,"digraph %s\n{\n",title);
+	fprintf(file,"_%d_%s [initial=1,color=green][style=filled,fillcolor=lightblue];\n",numgraph_actual,source_str);
+	fprintf(file,"_%d_%s [final=1,color=red][style=filled,fillcolor=lightblue];\n",numgraph_actual,target_str);
+	/*for (int u = 0; u < graphs[numgraph_actual].numNodes; u++)
+	{
+		if (
+	}*/
+	fclose(file);
+
+}
