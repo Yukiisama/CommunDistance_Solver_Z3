@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "Z3Tools.h"
 #include "Solving.h"
+
 void usage(){
     printf("Usage: graphParser file\n");
     printf(" Displays information on the graph discribed by file. It should be provided with a .dot file\n");
@@ -41,10 +42,11 @@ int main(int argc, char* argv[]){
     for(int i = 0; i<=graphs[0].numNodes; i++){
         Z3_ast Path_formula = graphsToPathFormula(ctx,graphs,numGraphs,i);
         if(i==0)printf("No simple valid path of length %d in all graphs  \n",0);
-        /*if(isFormulaSat(ctx,Path_formula)==Z3_L_TRUE){
+        if(isFormulaSat(ctx,Path_formula)==Z3_L_TRUE){
             Z3_model model = getModelFromSatFormula(ctx,Path_formula);
-	        printf("Model obtained of len %d for %s:\n",i,Z3_model_to_string(ctx,model));
-        }*/
+	        printf(" ICI Model obtained of len %d for %s:\n",i,Z3_model_to_string(ctx,model));
+            int x =getSolutionLengthFromModel(ctx,model,graphs);
+        }
     }
     //getSolutionLengthFromModel(ctx,model,graphs);
     

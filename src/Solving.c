@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "Z3Tools.h"
 #include "Graph.h"
+static int number_graphs = 0;
 /**
  * @brief Generates a formula consisting of a variable representing the fact that @p node of graph number @p number is at position @p position of an accepting path.
  * 
@@ -15,7 +16,9 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 	char s[50];
 	if(number<0 || position<0 || k<0 || node < 0)
 		fprintf(stderr, "getNodeVariable wrong arguments must be positive\n" ); 
-		
+	// This line is intented to give the number of graphs when i will use
+	// getSolutionLengthFromModel because numgraphs was not given
+	if(number+1>number_graphs)number_graphs = number+1; 
 	sprintf(s,"x%d,%d,%d,%d",number,position,k,node);
 	Z3_ast x = mk_bool_var(ctx, s);
 	//printf("Variable %s created.\n",Z3_ast_to_string(ctx,x));
@@ -268,22 +271,22 @@ Z3_ast Concat_sub_formulas(Z3_context ctx, Graph * graphs,unsigned int i, int pa
 		Z3_ast Phi_4= getIsPathFormula_PHI_4(ctx,graphs[i],i,pathLength);
 		Z3_ast Phi_5= getIsPathFormula_PHI_5(ctx,graphs[i],i,pathLength);
 		
-		check_satisfiable(ctx, Phi_1 ,"Check Phi ",1);
+		/*check_satisfiable(ctx, Phi_1 ,"Check Phi ",1);
 		check_satisfiable(ctx, Phi_2 ,"Check Phi ",2);
 		check_satisfiable(ctx, Phi_3 ,"Check Phi ",3);
 		check_satisfiable(ctx, Phi_4 ,"Check Phi ",4);
-		check_satisfiable(ctx, Phi_5 ,"Check Phi ",5);
+		check_satisfiable(ctx, Phi_5 ,"Check Phi ",5);*/
 		Z3_ast tab[5] = {Phi_1,Phi_2,Phi_3,Phi_4,Phi_5};
 		Z3_ast And_sub_formulas = Z3_mk_and(ctx,5,tab);
 		check_satisfiable(ctx, And_sub_formulas ,"Check all formulas ",-1);
 		if(isFormulaSat(ctx,And_sub_formulas)==Z3_L_TRUE){
-		Z3_model model = getModelFromSatFormula(ctx, And_sub_formulas);
-		printf("Model obtained for %s:\n",Z3_model_to_string(ctx,model));
-		printf("PHI 1 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_1));
-		printf("PHI 2 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_2));
-		printf("PHI 3 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_3));
-		printf("PHI 4 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_4));
-		printf("PHI 5 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_5));
+			Z3_model model = getModelFromSatFormula(ctx, And_sub_formulas);
+			printf("Model obtained for %s:\n",Z3_model_to_string(ctx,model));
+			printf("PHI 1 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_1));
+			printf("PHI 2 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_2));
+			printf("PHI 3 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_3));
+			printf("PHI 4 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_4));
+			printf("PHI 5 W MODEL : %d \n",valueOfVarInModel(ctx,model,Phi_5));
 		}
 		//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_sub_formulas)); //[DEBUG]
 		return And_sub_formulas;
@@ -364,15 +367,19 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
  * @return int The length of a common simple accepting path in all graphs from @p graphs.
  */ 
 int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
-	int numGraphs = sizeof(graphs)/sizeof(graphs[0]);
+
 	int Min_numberNodesAllgraphs = orderG(graphs[0]);
-	for(int i = 1;i < numGraphs;i++)
+	for(int i = 1;i < number_graphs;i++)
 	{
 		if(Min_numberNodesAllgraphs > orderG(graphs[i]))
 			Min_numberNodesAllgraphs = orderG(graphs[i]);
 	}
 	for(int j = 0; j<=Min_numberNodesAllgraphs; j++){
-    	Z3_ast Path_formula = graphsToPathFormula(ctx,graphs,numGraphs,j);
-		//puis regardeer avec le modèle
+    	Z3_ast Path_formula = graphsToPathFormula(ctx,graphs,number_graphs,j);
+		if(valueOfVarInModel(ctx,model,Path_formula)){
+			printf(" Solution Length from Model is  %d \n",j);
+			return j;
+		}
 	}
+	return 0;
 }
