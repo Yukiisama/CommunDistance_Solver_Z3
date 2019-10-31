@@ -484,45 +484,18 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 	for (int u = 0; u < graphs[numgraph_actual].numNodes; u++)
 	{
 		if (isSource(graphs[numgraph_actual], u)) // deplacer fprintf source ici
-		{	
 			source = u;
-			char * source_str = getNodeName(graphs[numgraph_actual],source);
-			fprintf(file,"_%d_%s [initial=1,color=green][style=filled,fillcolor=lightblue];\n",numgraph_actual,source_str);
-			continue;
-		}
-			
 		if (isTarget(graphs[numgraph_actual], u)) // deplacer fprintf target ici
-		{
 			target = u;
-			char * target_str = getNodeName(graphs[numgraph_actual],target);
-			fprintf(file,"_%d_%s [final=1,color=red][style=filled,fillcolor=lightblue];\n",numgraph_actual,target_str);
-			continue;
-		}
-		
-		for(int position = 0; position < pathLength;position++)
-		{
-			Z3_ast variable = getNodeVariable(ctx,numgraph_actual,position,pathLength,u);
-			
-			char * u_str = getNodeName(graphs[numgraph_actual],u);
-			
-			if(valueOfVarInModel(ctx,model,variable)==true)
-			  { 
-				fprintf(file,"_%d_%s [style=filled,fillcolor=lightblue];\n",numgraph_actual,u_str);
-				break;
-			  }
-			  
-			else if(position == pathLength-1)
-			  {
-				fprintf(file,"_%d_%s ;\n",numgraph_actual,u_str);
-			  }
-			  
-		}
-		//Faire les arêtes + arêtes chemins
-		
 	}
-	
-
-	
+	char * source_str = getNodeName(graphs[numgraph_actual],source);
+	char * target_str = getNodeName(graphs[numgraph_actual],target);
+	fprintf(file,"_%d_%s [initial=1,color=green][style=filled,fillcolor=lightblue];\n",numgraph_actual,source_str);
+	fprintf(file,"_%d_%s [final=1,color=red][style=filled,fillcolor=lightblue];\n",numgraph_actual,target_str);
+	/*for (int u = 0; u < graphs[numgraph_actual].numNodes; u++)
+	{
+		if (
+	}*/
 	fclose(file);
 
 }
