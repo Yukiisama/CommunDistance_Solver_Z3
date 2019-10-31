@@ -427,35 +427,35 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
 {
 	int indice_trueVal = 0;
 	int size_model = Z3_model_get_num_consts(ctx, model);
-    int nbgraph[size_model], pos[size_model], path[size_model], vertex[size_model];
-    for (int counter = 0; counter < size_model; counter++)
-    {
-        Z3_func_decl f = Z3_model_get_const_decl(ctx, model, counter);
-        //printf("TEST 1 : %s", Z3_func_decl_to_string(ctx, f));
-        //printf("TEST 1 : %s", Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)));
-        //printf(" ICI Model obtained of len %d for %s:\n",i,Z3_model_to_string(ctx,model));
-        if (strcmp(Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)), "true") == 0)
-        {
-            const char *tmp = Z3_func_decl_to_string(ctx, f);
-            sscanf(tmp, "(declare-fun |x%d,%d,%d,%d|%*s", &nbgraph[indice_trueVal], &pos[indice_trueVal], &path[indice_trueVal], &vertex[indice_trueVal]);
-            //printf("\nICI :|x%d,%d,%d,%d| , value = %s \n", nbgraph[indice_trueVal], pos[indice_trueVal], path[indice_trueVal], vertex[indice_trueVal], Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)));
-            indice_trueVal++;
-        }
-    }
-    //end for
-    printf("Path in graph %d \n",numGraph);
-	for(int i = 0; i<numGraph;i++){
-		for(int position = 0;position<graphs[i].numNodes;position++){
-			for(int x = 0; x<indice_trueVal;x++){
-				if(position==pos[x] && i==nbgraph[x])
-					printf("%d: pos %d: %s %s",nbgraph[x],pos[x],getNodeName(graphs[nbgraph[x]],vertex[x]),(position!=pathLength)?"->":"");
-				
-				
+	int nbgraph[size_model], pos[size_model], path[size_model], vertex[size_model];
+	for (int counter = 0; counter < size_model; counter++)
+	{
+		Z3_func_decl f = Z3_model_get_const_decl(ctx, model, counter);
+		//printf("TEST 1 : %s", Z3_func_decl_to_string(ctx, f));
+		//printf("TEST 1 : %s", Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)));
+		//printf(" ICI Model obtained of len %d for %s:\n",i,Z3_model_to_string(ctx,model));
+		if (strcmp(Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)), "true") == 0)
+		{
+			const char *tmp = Z3_func_decl_to_string(ctx, f);
+			sscanf(tmp, "(declare-fun |x%d,%d,%d,%d|%*s", &nbgraph[indice_trueVal], &pos[indice_trueVal], &path[indice_trueVal], &vertex[indice_trueVal]);
+			//printf("\nICI :|x%d,%d,%d,%d| , value = %s \n", nbgraph[indice_trueVal], pos[indice_trueVal], path[indice_trueVal], vertex[indice_trueVal], Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)));
+			indice_trueVal++;
+		}
+	}
+	//end for
+	printf("Path in graph %d \n", numGraph);
+	for (int i = 0; i < numGraph; i++)
+	{
+		for (int position = 0; position < graphs[i].numNodes; position++)
+		{
+			for (int x = 0; x < indice_trueVal; x++)
+			{
+				if (position == pos[x] && i == nbgraph[x])
+					printf("%d: pos %d: %s %s", nbgraph[x], pos[x], getNodeName(graphs[nbgraph[x]], vertex[x]), (position != pathLength) ? "->" : "");
 			}
 		}
 		printf("\n");
 	}
-
 }
 /**
  * @brief Creates the file ("%s-l%d.dot",name,pathLength) representing the solution to the problem described by @p model, or ("result-l%d.dot,pathLength") if name is NULL.
@@ -467,110 +467,102 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
  * @param pathLength The length of path.
  * @param name The name of the output file.
  */
-void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength, char* name){
+void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength, char *name)
+{
 	char title[1000];
 	char title_diagraph[1000];
-	if(name)
+	if (name)
 	{
-		sprintf(title, "%s-l%d.dot",name,pathLength);
-		sprintf(title_diagraph, "%s_l%d",name,pathLength);
+		sprintf(title, "%s-l%d.dot", name, pathLength);
+		sprintf(title_diagraph, "%s_l%d", name, pathLength);
 	}
 	else
 	{
-		sprintf(title, "result-l%d.dot",pathLength);
-		sprintf(title_diagraph, "result_l%d",pathLength);
+		sprintf(title, "result-l%d.dot", pathLength);
+		sprintf(title_diagraph, "result_l%d", pathLength);
 	}
-	FILE * file;
+	FILE *file;
 	file = fopen(title, "w");
-	if(file == NULL)
-    {
-        printf("Unable to create file.\n");
-        //exit(EXIT_FAILURE);
-    }
+	if (file == NULL)
+	{
+		printf("Unable to create file.\n");
+		//exit(EXIT_FAILURE);
+	}
 	int source, target;
 	//PENSER A ITERAL SUR CHAQUE GRAPH
 	int numgraph_actual = 0;
-	fprintf(file,"digraph %s{\n",title_diagraph);
-	for(numgraph_actual = 0;numgraph_actual<numGraph;numgraph_actual++)
+	fprintf(file, "digraph %s{\n", title_diagraph);
+	for (numgraph_actual = 0; numgraph_actual < numGraph; numgraph_actual++)
 	{
 		for (int u = 0; u < graphs[numgraph_actual].numNodes; u++)
 		{
 			if (isSource(graphs[numgraph_actual], u)) // deplacer fprintf source ici
-			{	
+			{
 				source = u;
-				char * source_str = getNodeName(graphs[numgraph_actual],source);
-				fprintf(file,"_%d_%s [initial=1,color=green][style=filled,fillcolor=lightblue];\n",numgraph_actual,source_str);
+				char *source_str = getNodeName(graphs[numgraph_actual], source);
+				fprintf(file, "_%d_%s [initial=1,color=green][style=filled,fillcolor=lightblue];\n", numgraph_actual, source_str);
 				continue;
 			}
-				
+
 			if (isTarget(graphs[numgraph_actual], u)) // deplacer fprintf target ici
 			{
 				target = u;
-				char * target_str = getNodeName(graphs[numgraph_actual],target);
-				fprintf(file,"_%d_%s [final=1,color=red][style=filled,fillcolor=lightblue];\n",numgraph_actual,target_str);
+				char *target_str = getNodeName(graphs[numgraph_actual], target);
+				fprintf(file, "_%d_%s [final=1,color=red][style=filled,fillcolor=lightblue];\n", numgraph_actual, target_str);
 				continue;
 			}
-			
-			for(int position = 0; position <= pathLength;position++)
+
+			for (int position = 0; position <= pathLength; position++)
 			{
-				Z3_ast variable = getNodeVariable(ctx,numgraph_actual,position,pathLength,u);
-				
-				char * u_str = getNodeName(graphs[numgraph_actual],u);
-				
-				if(valueOfVarInModel(ctx,model,variable)==true)
-				  { 
-					fprintf(file,"_%d_%s [style=filled,fillcolor=lightblue];\n",numgraph_actual,u_str);
+				Z3_ast variable = getNodeVariable(ctx, numgraph_actual, position, pathLength, u);
+
+				char *u_str = getNodeName(graphs[numgraph_actual], u);
+
+				if (valueOfVarInModel(ctx, model, variable) == true)
+				{
+					fprintf(file, "_%d_%s [style=filled,fillcolor=lightblue];\n", numgraph_actual, u_str);
 					break;
-				  }
-				  
-				else if(position == pathLength-1)
-				  {
-					fprintf(file,"_%d_%s ;\n",numgraph_actual,u_str);
-					
-				  }
-				  
+				}
+
+				else if (position == pathLength - 1)
+				{
+					fprintf(file, "_%d_%s ;\n", numgraph_actual, u_str);
+				}
 			}
-			
 		}
 		int written = 0;
 		//Faire les arêtes + arêtes chemins
-			for(int u = 0 ; u<graphs[numgraph_actual].numNodes;u++)
+		for (int u = 0; u < graphs[numgraph_actual].numNodes; u++)
+		{
+			for (int v = 0; v < graphs[numgraph_actual].numNodes; v++)
 			{
-				for(int v = 0 ; v<graphs[numgraph_actual].numNodes;v++)
+				for (int position = 0; position < graphs[numgraph_actual].numNodes; position++)
 				{
-					for(int position = 0; position < graphs[numgraph_actual].numNodes;position++)
+					for (int position2 = 0; position2 < graphs[numgraph_actual].numNodes; position2++)
 					{
-						for(int position2 = 0; position2 < graphs[numgraph_actual].numNodes;position2++)
+						Z3_ast variable = getNodeVariable(ctx, numgraph_actual, position, pathLength, u);
+						Z3_ast variable2 = getNodeVariable(ctx, numgraph_actual, position2, pathLength, v);
+						if (isEdge(graphs[numgraph_actual], u, v) && valueOfVarInModel(ctx, model, variable) == true && valueOfVarInModel(ctx, model, variable2) == true && position2 == position + 1)
 						{
-							Z3_ast variable = getNodeVariable(ctx,numgraph_actual,position,pathLength,u);
-							Z3_ast variable2 = getNodeVariable(ctx,numgraph_actual,position2,pathLength,v);
-							if(isEdge(graphs[numgraph_actual],u,v) && valueOfVarInModel(ctx,model,variable)==true 
-							&& valueOfVarInModel(ctx,model,variable2)==true && position2==position+1)
-							{
-								char * u_str = getNodeName(graphs[numgraph_actual],u);
-								char * v_str = getNodeName(graphs[numgraph_actual],v);
-								fprintf(file,"_%d_%s -> _%d_%s [color=blue];\n",numgraph_actual,u_str,numgraph_actual,v_str);
-								written=1;
-							}
-							else if(isEdge(graphs[numgraph_actual],u,v) && written==0 && position2 == graphs[numgraph_actual].numNodes -1 && position == graphs[numgraph_actual].numNodes -1)
-							{
-								char * u_str = getNodeName(graphs[numgraph_actual],u);
-								char * v_str = getNodeName(graphs[numgraph_actual],v);
-								fprintf(file,"_%d_%s -> _%d_%s ;\n",numgraph_actual,u_str,numgraph_actual,v_str);
-								written=1;
-								
-							}
+							char *u_str = getNodeName(graphs[numgraph_actual], u);
+							char *v_str = getNodeName(graphs[numgraph_actual], v);
+							fprintf(file, "_%d_%s -> _%d_%s [color=blue];\n", numgraph_actual, u_str, numgraph_actual, v_str);
+							written = 1;
 						}
-						
+						else if (isEdge(graphs[numgraph_actual], u, v) && written == 0 && position2 == graphs[numgraph_actual].numNodes - 1 && position == graphs[numgraph_actual].numNodes - 1)
+						{
+							char *u_str = getNodeName(graphs[numgraph_actual], u);
+							char *v_str = getNodeName(graphs[numgraph_actual], v);
+							fprintf(file, "_%d_%s -> _%d_%s ;\n", numgraph_actual, u_str, numgraph_actual, v_str);
+							written = 1;
+						}
 					}
-					written=0;
 				}
-				
+				written = 0;
 			}
 		}
-		fprintf(file,"}\n");
+	}
+	fprintf(file, "}\n");
 
-	
 	fclose(file);
-
 }
