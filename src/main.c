@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     //getNodeVariable(ctx, number, position, k, node);
     /*************************************Draw graphs****************************************/
     int numGraphs = argc - 1;
-    int pathLength = 4 ;
+    int pathLength = 6 ;
     Graph graphs[argc - 1];
     for (int i = 0; i < argc - 1; ++i) // Il faudra penser à prendre en compte les options etc
     {

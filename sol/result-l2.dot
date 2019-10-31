@@ -1,0 +1,21 @@
+digraph Sol_Length2{
+_0_s1 [initial=1,color=green][style=filled,fillcolor=lightblue];
+_0_t1 [final=1,color=red][style=filled,fillcolor=lightblue];
+_0_q1 ;
+_0_q2 [style=filled,fillcolor=lightblue];
+_0_q3 ;
+_0_s1 -> _0_q1 ;
+_0_s1 -> _0_q2 [color=blue];
+_0_q1 -> _0_t1 ;
+_0_q1 -> _0_q3 ;
+_0_q2 -> _0_t1 [color=blue];
+_0_q2 -> _0_q1 ;
+_0_q2 -> _0_q3 ;
+_0_q3 -> _0_t1 ;
+_1_s2 [initial=1,color=green][style=filled,fillcolor=lightblue];
+_1_t2 [final=1,color=red][style=filled,fillcolor=lightblue];
+_1_q [style=filled,fillcolor=lightblue];
+_1_s2 -> _1_q [color=blue];
+_1_t2 -> _1_s2 ;
+_1_q -> _1_t2 [color=blue];
+}

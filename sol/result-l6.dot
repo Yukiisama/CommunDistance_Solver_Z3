@@ -1,0 +1,34 @@
+digraph Sol_Length6{
+_0_q1 [initial=1,color=green][style=filled,fillcolor=lightblue];
+_0_q0 [final=1,color=red][style=filled,fillcolor=lightblue];
+_0_q2 [style=filled,fillcolor=lightblue];
+_0_q3 ;
+_0_q7 [style=filled,fillcolor=lightblue];
+_0_q10 ;
+_0_q6 [style=filled,fillcolor=lightblue];
+_0_q4 [style=filled,fillcolor=lightblue];
+_0_q5 ;
+_0_q8 ;
+_0_q9 [style=filled,fillcolor=lightblue];
+_0_q1 -> _0_q3 ;
+_0_q1 -> _0_q7 [color=blue];
+_0_q1 -> _0_q10 ;
+_0_q0 -> _0_q2 ;
+_0_q0 -> _0_q3 ;
+_0_q2 -> _0_q6 [color=blue];
+_0_q3 -> _0_q6 ;
+_0_q7 -> _0_q1 ;
+_0_q7 -> _0_q4 ;
+_0_q7 -> _0_q9 [color=blue];
+_0_q10 -> _0_q2 ;
+_0_q6 -> _0_q3 ;
+_0_q6 -> _0_q4 [color=blue];
+_0_q4 -> _0_q0 [color=blue];
+_0_q5 -> _0_q0 ;
+_0_q5 -> _0_q7 ;
+_0_q5 -> _0_q8 ;
+_0_q5 -> _0_q9 ;
+_0_q9 -> _0_q2 [color=blue];
+_0_q9 -> _0_q6 ;
+_0_q9 -> _0_q5 ;
+}
