@@ -79,7 +79,7 @@ Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph
 
 /**
  * @param ctx The solver context.
- * @param graph The graph
+ * @param graph The graph.
  * @param numGraph The number of the graph
  * @param pathLength The length of the path to check.
  * @return Z3_ast The formula phi 2.
