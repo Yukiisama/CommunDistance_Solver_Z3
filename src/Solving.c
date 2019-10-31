@@ -2,6 +2,11 @@
 #include <string.h>
 #include "Z3Tools.h"
 #include "Graph.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+extern int sflag;
+extern int aflag;
 static int number_graphs = 0;
 /**
  * @brief Generates a formula consisting of a variable representing the fact that @p node of graph number @p number is at position @p position of an accepting path.
@@ -39,7 +44,7 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 
 Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
-	printf("BEGIN PHI 1 \n");
+	//printf("BEGIN PHI 1 \n");
 	Z3_ast clause[100000];
 	int indice_clause = 0;
 	Z3_ast And_clause[100000];
@@ -52,7 +57,7 @@ Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph
 			{
 				if (!isEdge(graph, u, v))
 				{
-					printf("%d : %s, ", u, graph.nodes[u]); //[DEBUG]
+					//printf("%d : %s, ", u, graph.nodes[u]); //[DEBUG]
 					//printf("%d : %s, ",v,graph.nodes[v]);//[DEBUG]
 					//printf("%d : %d : %d : %d : %d \n",numGraph, position, pathLength, u,v); //[DEBUG]
 					Z3_ast xj = getNodeVariable(ctx, numGraph, position, pathLength, u);
@@ -73,7 +78,7 @@ Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph
 	}
 	Z3_ast And_final_clause = Z3_mk_and(ctx, indice_And_clause, And_clause);
 	//printf("AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause));
-	printf("END PHI 1 \n");
+	//printf("END PHI 1 \n");
 	return And_final_clause;
 }
 
@@ -89,7 +94,7 @@ Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph
 
 Z3_ast getIsPathFormula_PHI_2(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
-	printf("BEGIN PHI 2 \n");
+	//printf("BEGIN PHI 2 \n");
 	Z3_ast clause[100000];
 	int indice_clause = 0;
 	Z3_ast Or_clause[100000];
@@ -109,7 +114,7 @@ Z3_ast getIsPathFormula_PHI_2(Z3_context ctx, Graph graph, unsigned int numGraph
 	}
 	Z3_ast And_clause = Z3_mk_and(ctx, indice_Or_clause, Or_clause);
 	//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause));
-	printf("END PHI 2 \n");
+	//printf("END PHI 2 \n");
 	return And_clause;
 }
 
@@ -125,7 +130,7 @@ Z3_ast getIsPathFormula_PHI_2(Z3_context ctx, Graph graph, unsigned int numGraph
 
 Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
-	printf("BEGIN PHI 3 \n");
+	//printf("BEGIN PHI 3 \n");
 	Z3_ast clause[100000];
 	int indice_clause = 0;
 	Z3_ast And_clause[100000];
@@ -155,7 +160,7 @@ Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph, unsigned int numGraph
 	}
 	Z3_ast And_final_clause = Z3_mk_and(ctx, indice_And_clause, And_clause);
 	//printf("AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause)); //[DEBUG]
-	printf("END PHI 3 \n");
+	//printf("END PHI 3 \n");
 	return And_final_clause;
 }
 
@@ -171,7 +176,7 @@ Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph, unsigned int numGraph
 
 Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
-	printf("BEGIN PHI 4 \n");
+	//printf("BEGIN PHI 4 \n");
 	Z3_ast clause[100000];
 	int indice_clause = 0;
 	Z3_ast And_clause[100000];
@@ -203,9 +208,14 @@ Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph, unsigned int numGraph
 
 	Z3_ast And_final_clause = Z3_mk_and(ctx, indice_And_clause, And_clause);
 	//printf("AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause)); //[DEBUG]
-	printf("END PHI 4 \n");
+	//printf("END PHI 4 \n");
 	return And_final_clause;
 }
+
+
+
+
+
 
 /**
  * @param ctx The solver context.
@@ -218,7 +228,7 @@ Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph, unsigned int numGraph
 
 Z3_ast getIsPathFormula_PHI_5(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
-	printf("BEGIN PHI 5 \n");
+	//printf("BEGIN PHI 5 \n");
 	int source, target;
 	for (int u = 0; u < graph.numNodes; u++)
 	{
@@ -232,10 +242,12 @@ Z3_ast getIsPathFormula_PHI_5(Z3_context ctx, Graph graph, unsigned int numGraph
 	Z3_ast tab[2] = {xj_source, xj_target};
 	Z3_ast And_clause = Z3_mk_and(ctx, 2, tab);
 	//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause)); //[DEBUG]
-	printf("END PHI 5 \n");
+	//printf("END PHI 5 \n");
 
 	return And_clause;
 }
+
+
 
 void check_satisfiable(Z3_context ctx, Z3_ast f, const char *str, int number)
 {
@@ -300,16 +312,16 @@ Z3_ast Concat_sub_formulas(Z3_context ctx, Graph *graphs, unsigned int i, int pa
 		check_satisfiable(ctx, Phi_5 ,"Check Phi ",5);*/
 	Z3_ast tab[5] = {Phi_1, Phi_2, Phi_3, Phi_4, Phi_5};
 	Z3_ast And_sub_formulas = Z3_mk_and(ctx, 5, tab);
-	check_satisfiable(ctx, And_sub_formulas, "Check all formulas ", -1);
+	//check_satisfiable(ctx, And_sub_formulas, "Check all formulas ", -1);
 	if (isFormulaSat(ctx, And_sub_formulas) == Z3_L_TRUE)
 	{
 		Z3_model model = getModelFromSatFormula(ctx, And_sub_formulas);
-		printf("Model obtained for %s:\n", Z3_model_to_string(ctx, model));
-		printf("PHI 1 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_1));
-		printf("PHI 2 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_2));
-		printf("PHI 3 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_3));
-		printf("PHI 4 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_4));
-		printf("PHI 5 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_5));
+		//printf("Model obtained for %s:\n", Z3_model_to_string(ctx, model));
+		//printf("PHI 1 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_1));
+		//printf("PHI 2 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_2));
+		//printf("PHI 3 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_3));
+		//printf("PHI 4 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_4));
+		//printf("PHI 5 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_5));
 	}
 	//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_sub_formulas)); //[DEBUG]
 	return And_sub_formulas;
@@ -332,7 +344,7 @@ Z3_ast graphsToPathFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	Z3_ast t[2] = {x, notx};
 	if (pathLength < 1)
 	{
-		printf("pathLength %d : %d  \n", pathLength, -1);
+		//printf("pathLength %d : %d  \n", pathLength, -1);
 		return Z3_mk_and(ctx, 2, t);
 	}
 
@@ -341,19 +353,14 @@ Z3_ast graphsToPathFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	{
 		Sub_Formulas_Concat[i] = Concat_sub_formulas(ctx, graphs, i, pathLength);
 		//check_satisfiable(ctx, Sub_Formulas_Concat[i] ,"Sub_formulas_concat",i);
-		if (i != numGraphs - 1)
-			printf("*********Graph %d done ***********Next graph : ********************\n", i);
+		//if (i != numGraphs - 1)
+			//printf("*********Graph %d done ***********Next graph : ********************\n", i);
 	}
 	Z3_ast Allgraph_formula = Z3_mk_and(ctx, numGraphs, Sub_Formulas_Concat);
 
 	//printf("Allgraph_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Allgraph_formula)); //[DEBUG]
 	//check_satisfiable(ctx, Allgraph_formula ,"Check formula graph ",pathLength);
-	if (isFormulaSat(ctx, Allgraph_formula) == Z3_L_TRUE)
-		printf("There is a simple valid path of length %d in all graphs  \n", pathLength, isFormulaSat(ctx, Allgraph_formula));
-	else
-	{
-		printf("No simple valid path of length %d in all graphs  \n", pathLength, isFormulaSat(ctx, Allgraph_formula));
-	}
+	
 	return Allgraph_formula;
 }
 
@@ -381,8 +388,12 @@ Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	}
 	//Min_numberNodesAllgraphs-1 cause we have started writed to case 0 the formula for LenghtPath = 1
 	Z3_ast Full_formula = Z3_mk_or(ctx, Min_numberNodesAllgraphs - 1, Formulas_for_k_lenght_Concat);
+	
+	/** AMELIORATION STEP : We want only valuation of the found pathLength to be true **/
+	//Voir pour améliorer --> trouver une formule qui dit que si y'a un chemin , tous les autres sommets doivent être faux
+	
 	//printf("Full_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Full_formula)); //[DEBUG]
-	check_satisfiable(ctx, Full_formula, "FULL FORMULA", -1);
+	//check_satisfiable(ctx, Full_formula, "FULL FORMULA", -1);
 	return Full_formula;
 }
 /**
@@ -407,10 +418,11 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs)
 		Z3_ast Path_formula = graphsToPathFormula(ctx, graphs, number_graphs, j);
 		if (valueOfVarInModel(ctx, model, Path_formula))
 		{
-			printf(" Solution Length from Model is  %d \n", j);
+			printf("There is a simple valid path of length %d in all graphs  \n", j);
 			return j;
 		}
 	}
+	printf("No simple valid path in all graphs  \n");
 	return 0;
 }
 
@@ -443,9 +455,10 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
 		}
 	}
 	//end for
-	printf("Path in graph %d \n", numGraph);
+	
 	for (int i = 0; i < numGraph; i++)
 	{
+		printf("Path in graph %d \n", i);
 		for (int position = 0; position < graphs[i].numNodes; position++)
 		{
 			for (int x = 0; x < indice_trueVal; x++)
@@ -473,15 +486,21 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 	char title_diagraph[1000];
 	if (name)
 	{
-		sprintf(title, "%s-l%d.dot", name, pathLength);
+		sprintf(title, "sol/%s-l%d.dot", name, pathLength);
 		sprintf(title_diagraph, "%s_l%d", name, pathLength);
 	}
 	else
 	{
-		sprintf(title, "result-l%d.dot", pathLength);
+		sprintf(title, "sol/result-l%d.dot", pathLength);
 		sprintf(title_diagraph, "result_l%d", pathLength);
 	}
 	FILE *file;
+	struct stat st = {0};
+
+	if (stat("sol", &st) == -1) {
+		mkdir("sol", 0777);
+	}
+
 	file = fopen(title, "w");
 	if (file == NULL)
 	{
