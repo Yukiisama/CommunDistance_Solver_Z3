@@ -92,7 +92,6 @@ int main(int argc, char *argv[])
 			abort ();
 			
 		  }
-	//NE PAS OUBLIER INTEGRER COMPORTEMENT PAR DEFAUT SANS OPTIONS JUST FILE
 	/***********************************Init and Verbose Mode**********************************/
 	Z3_context ctx = makeContext();
 	int numGraphs = argc-optind;
@@ -118,6 +117,7 @@ int main(int argc, char *argv[])
 		{
 			Z3_model model = getModelFromSatFormula(ctx, Full_formula);
 			int x = getSolutionLengthFromModel(ctx,model,graphs);
+			printf("There is a simple valid path of length %d in all graphs  \n", x);
 			//if(tflag==1)printf("%s",Z3_model_to_string(ctx,model));
 			if(tflag==1)printPathsFromModel(ctx,model,graphs,numGraphs, x);
 			if(fflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, NULL);
@@ -139,6 +139,7 @@ int main(int argc, char *argv[])
 			{
 				Z3_model model = getModelFromSatFormula(ctx, Path_formula);
 				int x=getSolutionLengthFromModel(ctx,model,graphs);
+				printf("There is a simple valid path of length %d in all graphs  \n", x);
 				if(tflag==1)printPathsFromModel(ctx,model,graphs,numGraphs, i);
 				if(fflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, NULL);
 				if(oflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, ovalue);
@@ -153,56 +154,6 @@ int main(int argc, char *argv[])
 	}
 	///***************************Clear Memory*************************************/
 	Z3_del_context(ctx);
-	
-	
-	
-	
-	
-	
-	
-	//
-	//
-	
-	/*******A JETER*****/
-	////int number = 1;
-	////int position = 1;
-	////int k = 1;
-	////int node = 1;
-	////getNodeVariable(ctx, number, position, k, node);
-	///*************************************Draw graphs****************************************/
-	//int numGraphs = argc - 1;
-	//int pathLength = 6;
-	//Graph graphs[argc - 1];
-	//for (int i = 0; i < argc - 1; ++i) // Il faudra penser à prendre en compte les options etc
-	//{
-		//graphs[i] = getGraphFromFile(argv[i + 1]);
-		////printGraph(graphs[i]);
-	//}
-	///***************************Exec graphsToPathFormula**************************************/
-	//Z3_ast Path_formula = graphsToPathFormula(ctx, graphs, numGraphs, pathLength);
-	//Z3_model model = getModelFromSatFormula(ctx, Path_formula);
-	//printPathsFromModel(ctx, model, graphs, numGraphs, pathLength);
-	//char * filename = (char *)"Sol";
-	//createDotFromModel(ctx, model, graphs, numGraphs, pathLength, filename);
 
-	///***************************Exec graphsToFullFormula**************************************/
-	////Z3_ast Full_formula = graphsToFullFormula(ctx,graphs,numGraphs);
-	///***************************Create model and Exec getSolutionLengthFromModel**************************************/
-	///*for (int i = 0; i <= graphs[0].numNodes; i++)
-    //{
-        //Z3_ast Path_formula = graphsToPathFormula(ctx, graphs, numGraphs, i);
-        //if (i == 0)
-            //printf("No simple valid path of length %d in all graphs  \n", 0);
-        //if (isFormulaSat(ctx, Path_formula) == Z3_L_TRUE)
-        //{
-            //Z3_model model = getModelFromSatFormula(ctx, Path_formula);
-            ////printPathsFromModel(ctx,model, graphs, numGraphs,i);
-            
-            //int x = getSolutionLengthFromModel(ctx, model, graphs);
-        //}
-    //}*/
-	///***************************Clear Memory*************************************/
-	//printf("Context deleted, memory is now clean.\n");
-	//Z3_del_context(ctx);
 	return 0;
 }

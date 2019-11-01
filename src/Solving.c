@@ -357,13 +357,19 @@ Z3_ast graphsToPathFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 			//printf("*********Graph %d done ***********Next graph : ********************\n", i);
 	}
 	Z3_ast Allgraph_formula = Z3_mk_and(ctx, numGraphs, Sub_Formulas_Concat);
-
+	
 	//printf("Allgraph_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Allgraph_formula)); //[DEBUG]
 	//check_satisfiable(ctx, Allgraph_formula ,"Check formula graph ",pathLength);
 	
 	return Allgraph_formula;
 }
 
+
+
+
+
+
+int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs);
 /**
  * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of common length.
  * 
@@ -389,12 +395,33 @@ Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	//Min_numberNodesAllgraphs-1 cause we have started writed to case 0 the formula for LenghtPath = 1
 	Z3_ast Full_formula = Z3_mk_or(ctx, Min_numberNodesAllgraphs - 1, Formulas_for_k_lenght_Concat);
 	
-	/** AMELIORATION STEP : We want only valuation of the found pathLength to be true **/
+	/** AMELIORATION STEP 2 : We want only valuation of the found pathLength to be true */
 	//Voir pour améliorer --> trouver une formule qui dit que si y'a un chemin , tous les autres sommets doivent être faux
-	
+	Z3_model model = getModelFromSatFormula(ctx, Full_formula);
+	int source = 0;
+	int length_solution = 0;
+	for (int u = 0; u < graphs[0].numNodes; u++)
+		{
+			if (isSource(graphs[0], u)) 
+			{
+				source = u;
+				break;
+			}
+	}
+	for(int length = Min_numberNodesAllgraphs; length>0 ; length--)
+	{
+		Z3_ast variable = getNodeVariable(ctx, 0, 0,length,source);
+		if (valueOfVarInModel(ctx, model, variable))
+		{
+			length_solution = length;
+			break;
+		}
+	}
+	Z3_ast t[2] = {Full_formula,graphsToPathFormula(ctx, graphs, numGraphs, length_solution)};
+	Z3_ast Upgrade_formula = Z3_mk_and(ctx, 2, t); 
 	//printf("Full_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Full_formula)); //[DEBUG]
 	//check_satisfiable(ctx, Full_formula, "FULL FORMULA", -1);
-	return Full_formula;
+	return Upgrade_formula;
 }
 /**
  * @brief Gets the length of the solution from a given model.
@@ -413,13 +440,26 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs)
 		if (Min_numberNodesAllgraphs > orderG(graphs[i]))
 			Min_numberNodesAllgraphs = orderG(graphs[i]);
 	}
-	for (int j = 0; j <= Min_numberNodesAllgraphs; j++)
-	{
-		Z3_ast Path_formula = graphsToPathFormula(ctx, graphs, number_graphs, j);
-		if (valueOfVarInModel(ctx, model, Path_formula))
+	//As we take care the full formula only puts at true the valuation of an unique path ,
+	//We only need here to check only if one vertex is a true to get the length,
+	//Cause formulas already check if it exist a single and valid path
+	int source = 0;
+	for (int u = 0; u < graphs[0].numNodes; u++)
 		{
-			printf("There is a simple valid path of length %d in all graphs  \n", j);
-			return j;
+			if (isSource(graphs[0], u)) // deplacer fprintf source ici
+			{
+				source = u;
+				break;
+			}
+	}
+	for (int pathLength =  Min_numberNodesAllgraphs; pathLength >0 ; pathLength--)
+	{
+		Z3_ast variable = getNodeVariable(ctx, 0, 0, pathLength,source);
+
+		if (valueOfVarInModel(ctx, model, variable))
+		{
+			//printf("There is a simple valid path of length %d in all graphs  \n", j);
+			return pathLength;
 		}
 	}
 	printf("No simple valid path in all graphs  \n");
@@ -464,7 +504,7 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
 			for (int x = 0; x < indice_trueVal; x++)
 			{
 				if (position == pos[x] && i == nbgraph[x])
-					printf("%d: pos %d: %s %s", nbgraph[x], pos[x], getNodeName(graphs[nbgraph[x]], vertex[x]), (position != pathLength) ? "->" : "");
+					printf("%d: pos %d: %s %s", nbgraph[x], pos[x], getNodeName(graphs[nbgraph[x]], vertex[x]), (position != pathLength) ? "-> " : "");
 			}
 		}
 		printf("\n");
