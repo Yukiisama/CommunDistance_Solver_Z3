@@ -411,7 +411,7 @@ Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	for(int length = Min_numberNodesAllgraphs; length>0 ; length--)
 	{
 		Z3_ast variable = getNodeVariable(ctx, 0, 0,length,source);
-		if (valueOfVarInModel(ctx, model, variable))
+		if (valueOfVarInModel(ctx, model, variable) && valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable))
 		{
 			length_solution = length;
 			break;
