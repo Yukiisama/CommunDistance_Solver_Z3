@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 		case 'h':
 			hflag=1;
 			usage();
-			break;
+			return 0;
 		case 'v':
 			vflag=1;
 			break;
@@ -130,25 +130,52 @@ int main(int argc, char *argv[])
 	/***Calculate Length Solution (-s present so path formula ,stop when find one , don't stop if -a present)*****************/
 	if(sflag==1)
 	{
-		for (int i = 0; i <=Min_numberNodesAllgraphs; i++)
-		{	
-			
-			Z3_ast Path_formula = graphsToPathFormula(ctx, graphs, numGraphs, i);
-			if(Fflag==1) printf("Path_formula of len %d : \n  %s \n",i,Z3_ast_to_string(ctx,Path_formula));
-			if (isFormulaSat(ctx, Path_formula)== Z3_L_TRUE)
-			{
-				Z3_model model = getModelFromSatFormula(ctx, Path_formula);
-				int x=getSolutionLengthFromModel(ctx,model,graphs);
-				printf("There is a simple valid path of length %d in all graphs  \n", x);
-				if(tflag==1)printPathsFromModel(ctx,model,graphs,numGraphs, i);
-				if(fflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, NULL);
-				if(oflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, ovalue);
-				if(aflag==0)break;
+		if(dflag==0)
+		{
+			for (int i = 0; i <=Min_numberNodesAllgraphs; i++)
+			{	
 				
+				Z3_ast Path_formula = graphsToPathFormula(ctx, graphs, numGraphs, i);
+				if(Fflag==1) printf("Path_formula of len %d : \n  %s \n",i,Z3_ast_to_string(ctx,Path_formula));
+				if (isFormulaSat(ctx, Path_formula)== Z3_L_TRUE)
+				{
+					Z3_model model = getModelFromSatFormula(ctx, Path_formula);
+					int x=getSolutionLengthFromModel(ctx,model,graphs);
+					printf("There is a simple valid path of length %d in all graphs  \n", x);
+					if(tflag==1)printPathsFromModel(ctx,model,graphs,numGraphs, i);
+					if(fflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, NULL);
+					if(oflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, ovalue);
+					if(aflag==0)break;
+					
+				}
+				else
+				{
+					printf("No simple valid path of length %d in all graphs  \n", i);
+				}
 			}
-			else
-			{
-				printf("No simple valid path of length %d in all graphs  \n", i);
+		}
+		if(dflag==1)
+		{
+			for (int i = Min_numberNodesAllgraphs; i >0; i--)
+			{	
+				
+				Z3_ast Path_formula = graphsToPathFormula(ctx, graphs, numGraphs, i);
+				if(Fflag==1) printf("Path_formula of len %d : \n  %s \n",i,Z3_ast_to_string(ctx,Path_formula));
+				if (isFormulaSat(ctx, Path_formula)== Z3_L_TRUE)
+				{
+					Z3_model model = getModelFromSatFormula(ctx, Path_formula);
+					int x=getSolutionLengthFromModel(ctx,model,graphs);
+					printf("There is a simple valid path of length %d in all graphs  \n", x);
+					if(tflag==1)printPathsFromModel(ctx,model,graphs,numGraphs, i);
+					if(fflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, NULL);
+					if(oflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, ovalue);
+					if(aflag==0)break;
+					
+				}
+				else
+				{
+					printf("No simple valid path of length %d in all graphs  \n", i);
+				}
 			}
 		}
 	}
