@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
 extern int sflag;
 extern int aflag;
 static int number_graphs = 0;
@@ -365,6 +366,62 @@ Z3_ast graphsToPathFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 }
 
 
+Z3_ast Upgrade(Z3_context ctx, Graph *graphs, unsigned int numGraphs, int minNodes)
+{
+	
+	Z3_ast clause[100000];
+	int indice_clause = 0;
+	Z3_ast And_clause[100000];
+	int indice_And_clause = 0;
+	Z3_ast End_clause[100000];
+	int indice_End_clause = 0;
+	Z3_ast Or_clause[100000];
+	int indice_Or_clause = 0;
+	
+	Z3_ast t[100000];
+	int t_i = 0;
+	Z3_ast tt[100000];
+	int tt_i = 0;
+	
+	for (int i = 0; i < numGraphs; i++)
+	{
+		for(int k = 0 ; k < minNodes ; k++)
+		{
+			Z3_ast xsource = getNodeVariable(ctx, i, 0 , k, 0);
+			for (int v = 0; v < graphs[i].numNodes; v++)
+			{
+				for (int j = 0; j <minNodes; j++)
+				{
+					for (int kk = 0; kk < minNodes; kk++)
+					{
+						if(kk!=k)
+						{
+							
+							Z3_ast xkk = getNodeVariable(ctx, i, j , kk, v);
+							Z3_ast negkk = Z3_mk_not(ctx, xkk);
+							clause[indice_clause] = negkk;
+							indice_clause++;
+						}
+					}
+					t[t_i]= Z3_mk_and(ctx, indice_clause, clause);
+					t_i++;
+					indice_clause =0;
+				}
+				tt[tt_i]= Z3_mk_and(ctx, t_i, t);
+				tt_i++;
+				t_i =0;
+			}
+			And_clause[indice_And_clause] = Z3_mk_and(ctx, tt_i, tt);
+			Z3_ast tab[2] = {xsource,And_clause[indice_And_clause]};
+			Or_clause[indice_Or_clause] = Z3_mk_and(ctx,2,tab);
+			indice_Or_clause++;
+			tt_i=0;
+		}
+		End_clause[indice_End_clause] = Z3_mk_or(ctx, indice_Or_clause, Or_clause);
+		indice_End_clause++;
+	}
+	return Z3_mk_and(ctx,indice_End_clause,End_clause);
+}
 
 
 
@@ -378,6 +435,7 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs);
  * @param numGraphs The number of graphs in @p graphs.
  * @return Z3_ast The formula.
  */
+
 Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs)
 {
 	int Min_numberNodesAllgraphs = orderG(graphs[0]);
@@ -397,9 +455,9 @@ Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	
 	/** AMELIORATION STEP 2 : We want only valuation of the found pathLength to be true */
 	//Voir pour améliorer --> trouver une formule qui dit que si y'a un chemin , tous les autres sommets doivent être faux
-	if(isFormulaSat(ctx, Full_formula) == Z3_L_TRUE)
+	if(isFormulaSat(ctx, Full_formula) == Z3_L_TRUE) // I.e il y'a au moins 1 chemin, pas la peine de faire l'amélioration 2 si pas de chemin
 	{
-		Z3_model model = getModelFromSatFormula(ctx, Full_formula);
+		/*Z3_model model = getModelFromSatFormula(ctx, Full_formula);
 		int source = 0;
 		int length_solution = 0;
 		for (int u = 0; u < graphs[0].numNodes; u++)
@@ -413,13 +471,17 @@ Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 		for(int length = Min_numberNodesAllgraphs; length>0 ; length--)
 		{
 			Z3_ast variable = getNodeVariable(ctx, 0, 0,length,source);
-			if (valueOfVarInModel(ctx, model, variable) && valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable))
+			if (valueOfVarInModel(ctx, model, variable) )//&& valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable))
 			{
-				length_solution = length;
-				break;
+				if(isFormulaSat(ctx, graphsToPathFormula(ctx, graphs, numGraphs, length))==Z3_L_TRUE && valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable)){
+
+					length_solution = length;
+					break;
+				}
 			}
-		}
-		Z3_ast t[2] = {Full_formula,graphsToPathFormula(ctx, graphs, numGraphs, length_solution)};
+		}*/
+		//Z3_ast t[2] = {Full_formula,graphsToPathFormula(ctx, graphs, numGraphs, length_solution)};
+		Z3_ast t[2] = {Full_formula,Upgrade(ctx,graphs,numGraphs,Min_numberNodesAllgraphs)};
 		Z3_ast Upgrade_formula = Z3_mk_and(ctx, 2, t); 
 		//printf("Full_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Full_formula)); //[DEBUG]
 		//check_satisfiable(ctx, Full_formula, "FULL FORMULA", -1);
