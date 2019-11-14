@@ -375,8 +375,8 @@ Z3_ast Upgrade(Z3_context ctx, Graph *graphs, unsigned int numGraphs, int minNod
 	int indice_And_clause = 0;
 	Z3_ast End_clause[100000];
 	int indice_End_clause = 0;
-	Z3_ast Or_clause[100000];
-	int indice_Or_clause = 0;
+	Z3_ast andand_clause[100000];
+	int indice_andand_clause = 0;
 	
 	Z3_ast t[100000];
 	int t_i = 0;
@@ -413,14 +413,33 @@ Z3_ast Upgrade(Z3_context ctx, Graph *graphs, unsigned int numGraphs, int minNod
 			}
 			And_clause[indice_And_clause] = Z3_mk_and(ctx, tt_i, tt);
 			Z3_ast tab[2] = {xsource,And_clause[indice_And_clause]};
-			Or_clause[indice_Or_clause] = Z3_mk_and(ctx,2,tab);
-			indice_Or_clause++;
+			andand_clause[indice_andand_clause] = Z3_mk_and(ctx,2,tab);
+			indice_andand_clause++;
 			tt_i=0;
 		}
-		End_clause[indice_End_clause] = Z3_mk_or(ctx, indice_Or_clause, Or_clause);
+		End_clause[indice_End_clause] = Z3_mk_or(ctx, indice_andand_clause, andand_clause);
 		indice_End_clause++;
 	}
 	return Z3_mk_and(ctx,indice_End_clause,End_clause);
+	/*Z3_ast final = Z3_mk_and(ctx,indice_End_clause,End_clause);
+	Z3_ast sources[numGraphs];
+	int s_i = 0;
+	Z3_ast sources_k_i[minNodes];
+	int k_i= 0;
+	for(int k = 0; k<minNodes;k++)
+	{
+		for(int i = 0; i < numGraphs ;i++)
+		{
+			sources[s_i] = getNodeVariable(ctx, i, 0 , k, 0);
+			s_i++;
+		}
+		sources_k_i[k_i] =Z3_mk_and(ctx,s_i,sources);
+		k_i++;
+		s_i=0;
+	}
+	Z3_ast tabfinal[2] = {final,Z3_mk_or(ctx,k_i,sources_k_i)};
+	
+	return Z3_mk_and(ctx,2,tabfinal);*/
 }
 
 
