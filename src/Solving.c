@@ -213,7 +213,6 @@ Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph, unsigned int numGraph
 		}
 		And_clause[indice_And_clause] = Z3_mk_and(ctx, indice_clause, clause);
 		//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause[indice_And_clause])); //[DEBUG]
-		//printf(" max: %d , clauses : %d \n",max_size,indice_clause);
 		indice_And_clause++;
 		indice_clause = 0;
 	}
@@ -380,21 +379,21 @@ Z3_ast graphsToPathFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 Z3_ast Upgrade(Z3_context ctx, Graph *graphs, unsigned int numGraphs, int minNodes)
 {
 	
-	Z3_ast clause[100000];
+	Z3_ast clause[minNodes+1];
 	int indice_clause = 0;
-	Z3_ast And_clause[100000];
+	Z3_ast And_clause[minNodes+1];
 	int indice_And_clause = 0;
-	Z3_ast End_clause[100000];
-	int indice_End_clause = 0;
-	Z3_ast andand_clause[100000];
+	//Z3_ast End_clause[100000];
+	//int indice_End_clause = 0;
+	Z3_ast andand_clause[minNodes+1];
 	int indice_andand_clause = 0;
 	
-	Z3_ast t[100000];
+	Z3_ast t[minNodes+1];
 	int t_i = 0;
-	Z3_ast tt[100000];
+	Z3_ast tt[minNodes+1];
 	int tt_i = 0;
 
-	Z3_ast And_graph[100000];
+	Z3_ast And_graph[minNodes+1];
 	int and_g_i = 0;
 	
 	//for (int i = 0; i < numGraphs; i++)
@@ -445,6 +444,7 @@ Z3_ast Upgrade(Z3_context ctx, Graph *graphs, unsigned int numGraphs, int minNod
 		}
 		//End_clause[indice_End_clause] = Z3_mk_or(ctx, indice_andand_clause, andand_clause);
 		//indice_End_clause++;
+		//printf(" max: %d , clauses : %d \n",minNodes+1,indice_andand_clause);
 		return Z3_mk_or(ctx, indice_andand_clause, andand_clause);
 	}
 	//return Z3_mk_and(ctx,indice_End_clause,End_clause);
