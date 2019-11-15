@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 		graphs[i] = getGraphFromFile(argv[optind+i]);
 		if(vflag) printGraph(graphs[i]);
 	}
-	//
+
 	int Min_numberNodesAllgraphs = orderG(graphs[0]);
 	for (int i = 1; i < numGraphs; i++)
 	{
@@ -114,12 +114,13 @@ int main(int argc, char *argv[])
 	{
 		Z3_ast Full_formula = graphsToFullFormula(ctx, graphs, numGraphs);
 		if(Fflag==1) printf("Full_formula : \n  %s \n",Z3_ast_to_string(ctx,Full_formula));
+		
 		if (isFormulaSat(ctx, Full_formula)== Z3_L_TRUE)
 		{
 			Z3_model model = getModelFromSatFormula(ctx, Full_formula);
 			int x = getSolutionLengthFromModel(ctx,model,graphs);
 			printf("There is a simple valid path of length %d in all graphs  \n", x);
-			//if(tflag==1)printf("%s",Z3_model_to_string(ctx,model));
+			//if(tflag==1)printf("[DEBUG]%s",Z3_model_to_string(ctx,model));
 			if(tflag==1)printPathsFromModel(ctx,model,graphs,numGraphs, x);
 			if(fflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, NULL);
 			if(oflag==1)createDotFromModel(ctx,model, graphs,numGraphs, x, ovalue);

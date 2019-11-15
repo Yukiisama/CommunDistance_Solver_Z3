@@ -6,9 +6,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-extern int sflag;
-extern int aflag;
-static int number_graphs = 0;
 /**
  * @brief Generates a formula consisting of a variable representing the fact that @p node of graph number @p number is at position @p position of an accepting path.
  * 
@@ -26,8 +23,6 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 		fprintf(stderr, "getNodeVariable wrong arguments must be positive\n");
 	// This line is intented to give the number of graphs when i will use
 	// getSolutionLengthFromModel because numgraphs was not given
-	if (number + 1 > number_graphs)
-		number_graphs = number + 1;
 	sprintf(s, "x%d,%d,%d,%d", number, position, k, node);
 	Z3_ast x = mk_bool_var(ctx, s);
 	//printf("[DEBUG]:Variable %s created.\n",Z3_ast_to_string(ctx,x));
@@ -240,7 +235,7 @@ Z3_ast getIsPathFormula_PHI_5(Z3_context ctx, Graph graph, unsigned int numGraph
 }
 
 
-
+//Debug function : check if satisfiable for the given formula
 void check_satisfiable(Z3_context ctx, Z3_ast f, const char *str, int number)
 {
 	if (number != -1)
@@ -288,7 +283,7 @@ void check_satisfiable(Z3_context ctx, Z3_ast f, const char *str, int number)
 		}
 	}
 }
-
+// Generate the conjonction of subformulas for the  i-th graph for the length pathLength
 Z3_ast Concat_sub_formulas(Z3_context ctx, Graph *graphs, unsigned int i, int pathLength)
 {
 	Z3_ast Phi_1 = getIsPathFormula_PHI_1(ctx, graphs[i], i, pathLength);
@@ -425,7 +420,7 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs)
 				break;
 			}
 	}
-	for (int pathLength =  orderG(graphs[0]); pathLength >0 ; pathLength--)
+	for (int pathLength = 0 ; pathLength <=orderG(graphs[0]) ; pathLength++)
 	{
 		Z3_ast variable = getNodeVariable(ctx, 0, 0, pathLength,source);
 
