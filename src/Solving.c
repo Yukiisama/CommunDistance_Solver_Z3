@@ -30,7 +30,7 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 		number_graphs = number + 1;
 	sprintf(s, "x%d,%d,%d,%d", number, position, k, node);
 	Z3_ast x = mk_bool_var(ctx, s);
-	//printf("Variable %s created.\n",Z3_ast_to_string(ctx,x));
+	//printf("[DEBUG]:Variable %s created.\n",Z3_ast_to_string(ctx,x));
 	return x;
 }
 
@@ -45,7 +45,6 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 
 Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
-	//printf("BEGIN PHI 1 \n");
 	unsigned max_size = graph.numNodes *graph.numNodes;
 	Z3_ast clause[max_size];
 	int indice_clause = 0;
@@ -59,30 +58,24 @@ Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph
 			{
 				if (!isEdge(graph, u, v))
 				{
-					//printf("%d : %s, ", u, graph.nodes[u]); //[DEBUG]
-					//printf("%d : %s, ",v,graph.nodes[v]);//[DEBUG]
-					//printf("%d : %d : %d : %d : %d \n",numGraph, position, pathLength, u,v); //[DEBUG]
 					Z3_ast xj = getNodeVariable(ctx, numGraph, position, pathLength, u);
 					Z3_ast xj_1 = getNodeVariable(ctx, numGraph, position + 1, pathLength, v);
 					Z3_ast negxj = Z3_mk_not(ctx, xj);
 					Z3_ast negxj_1 = Z3_mk_not(ctx, xj_1);
 					Z3_ast anOtherTab[2] = {negxj, negxj_1};
 					clause[indice_clause] = Z3_mk_or(ctx, 2, anOtherTab);
-					//printf("We have now: %s\n\n",Z3_ast_to_string(ctx,clause[indice_clause])); //[DEBUG]
+					//printf("[DEBUG]:We have now: %s\n\n",Z3_ast_to_string(ctx,clause[indice_clause]));
 					indice_clause++;
 				}
 			}
 		}
 		And_clause[indice_And_clause] = Z3_mk_and(ctx, indice_clause, clause);
-		//printf("OR CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,Or_clause[indice_Or_clause])); //[DEBUG]
+		//printf("[DEBUG]:OR CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,Or_clause[indice_Or_clause]));
 		indice_And_clause++;
-
 		indice_clause = 0;
 	}
-	Z3_ast And_final_clause = Z3_mk_and(ctx, indice_And_clause, And_clause);
-				
-	//printf("AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause));
-	//printf("END PHI 1 \n");
+	Z3_ast And_final_clause = Z3_mk_and(ctx, indice_And_clause, And_clause);			
+	//printf("[DEBUG]:AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause));
 	return And_final_clause;
 }
 
@@ -98,7 +91,6 @@ Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph
 
 Z3_ast getIsPathFormula_PHI_2(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
-	//printf("BEGIN PHI 2 \n");
 	unsigned max_size = graph.numNodes*graph.numNodes;
 	Z3_ast clause[max_size];
 	int indice_clause = 0;
@@ -113,15 +105,12 @@ Z3_ast getIsPathFormula_PHI_2(Z3_context ctx, Graph graph, unsigned int numGraph
 			indice_clause++;
 		}
 		Or_clause[indice_Or_clause] = Z3_mk_or(ctx, indice_clause, clause);
-		//printf("OR CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,Or_clause[indice_Or_clause])); //[DEBUG]
-		
+		//printf("[DEBUG]:OR CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,Or_clause[indice_Or_clause]));
 		indice_Or_clause++;
-		
 		indice_clause = 0;
 	}
 	Z3_ast And_clause = Z3_mk_and(ctx, indice_Or_clause, Or_clause);
-	//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause));
-	//printf("END PHI 2 \n");
+	//printf("[DEBUG]:AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause));
 	return And_clause;
 }
 
@@ -138,7 +127,6 @@ Z3_ast getIsPathFormula_PHI_2(Z3_context ctx, Graph graph, unsigned int numGraph
 Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
 	unsigned max_size = graph.numNodes*graph.numNodes;
-	//printf("BEGIN PHI 3 \n");
 	Z3_ast clause[max_size];
 	int indice_clause = 0;
 	Z3_ast And_clause[max_size];
@@ -162,15 +150,12 @@ Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph, unsigned int numGraph
 			}
 		}
 		And_clause[indice_And_clause] = Z3_mk_and(ctx, indice_clause, clause);
-		//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause[indice_And_clause])); //[DEBUG]
-		indice_And_clause++;
-		
+		//printf("[DEBUG]:AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause[indice_And_clause])); 
+		indice_And_clause++;	
 		indice_clause = 0;
 	}
-		
 	Z3_ast And_final_clause = Z3_mk_and(ctx, indice_And_clause, And_clause);
-	//printf("AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause)); //[DEBUG]
-	//printf("END PHI 3 \n");
+	//printf("[DEBUG]:AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause));
 	return And_final_clause;
 }
 
@@ -186,7 +171,7 @@ Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph, unsigned int numGraph
 
 Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
-	//printf("BEGIN PHI 4 \n");
+
 	unsigned max_size = graph.numNodes*(pathLength+1);
 	Z3_ast clause[max_size];
 	int indice_clause = 0;
@@ -212,14 +197,13 @@ Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph, unsigned int numGraph
 			}
 		}
 		And_clause[indice_And_clause] = Z3_mk_and(ctx, indice_clause, clause);
-		//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause[indice_And_clause])); //[DEBUG]
+		//printf("[DEBUG]:AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause[indice_And_clause])); 
 		indice_And_clause++;
 		indice_clause = 0;
 	}
 
 	Z3_ast And_final_clause = Z3_mk_and(ctx, indice_And_clause, And_clause);
-	//printf("AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause)); //[DEBUG]
-	//printf("END PHI 4 \n");
+	//printf("[DEBUG]:AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause)); 
 	return And_final_clause;
 }
 
@@ -239,7 +223,6 @@ Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph, unsigned int numGraph
 
 Z3_ast getIsPathFormula_PHI_5(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
-	//printf("BEGIN PHI 5 \n");
 	int source, target;
 	for (int u = 0; u < graph.numNodes; u++)
 	{
@@ -252,9 +235,7 @@ Z3_ast getIsPathFormula_PHI_5(Z3_context ctx, Graph graph, unsigned int numGraph
 	Z3_ast xj_target = getNodeVariable(ctx, numGraph, pathLength, pathLength, target);
 	Z3_ast tab[2] = {xj_source, xj_target};
 	Z3_ast And_clause = Z3_mk_and(ctx, 2, tab);
-	//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause)); //[DEBUG]
-	//printf("END PHI 5 \n");
-
+	//printf("[DEBUG]:AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause)); 
 	return And_clause;
 }
 
@@ -279,7 +260,7 @@ void check_satisfiable(Z3_context ctx, Z3_ast f, const char *str, int number)
 			printf("%s \n %s number %d is satisfiable.\n", Z3_ast_to_string(ctx, f), str, number);
 			printf("********************END CHECK SATISFIABLE***************************************\n");
 			//Z3_model model = getModelFromSatFormula(ctx,Phi_1[i]);
-			//printf("Model obtained for %s:\n",Z3_model_to_string(ctx,model));
+			//printf("[DEBUG]:Model obtained for %s:\n",Z3_model_to_string(ctx,model));
 			break;
 		}
 	}
@@ -301,7 +282,7 @@ void check_satisfiable(Z3_context ctx, Z3_ast f, const char *str, int number)
 			printf("%s \n %s is satisfiable.\n", Z3_ast_to_string(ctx, f), str);
 			printf("********************END CHECK SATISFIABLE***************************************\n");
 			//Z3_model model = getModelFromSatFormula(ctx,f);
-			//printf("Model obtained for %s:\n",Z3_model_to_string(ctx,model));
+			//printf("[DEBUG]:Model obtained for %s:\n",Z3_model_to_string(ctx,model));
 
 			break;
 		}
@@ -316,25 +297,14 @@ Z3_ast Concat_sub_formulas(Z3_context ctx, Graph *graphs, unsigned int i, int pa
 	Z3_ast Phi_4 = getIsPathFormula_PHI_4(ctx, graphs[i], i, pathLength);
 	Z3_ast Phi_5 = getIsPathFormula_PHI_5(ctx, graphs[i], i, pathLength);
 
-	/*check_satisfiable(ctx, Phi_1 ,"Check Phi ",1);
-		check_satisfiable(ctx, Phi_2 ,"Check Phi ",2);
-		check_satisfiable(ctx, Phi_3 ,"Check Phi ",3);
-		check_satisfiable(ctx, Phi_4 ,"Check Phi ",4);
-		check_satisfiable(ctx, Phi_5 ,"Check Phi ",5);*/
 	Z3_ast tab[5] = {Phi_1, Phi_2, Phi_3, Phi_4, Phi_5};
 	Z3_ast And_sub_formulas = Z3_mk_and(ctx, 5, tab);
-	//check_satisfiable(ctx, And_sub_formulas, "Check all formulas ", -1);
 	if (isFormulaSat(ctx, And_sub_formulas) == Z3_L_TRUE)
 	{
 		Z3_model model = getModelFromSatFormula(ctx, And_sub_formulas);
-		//printf("Model obtained for %s:\n", Z3_model_to_string(ctx, model));
-		//printf("PHI 1 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_1));
-		//printf("PHI 2 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_2));
-		//printf("PHI 3 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_3));
-		//printf("PHI 4 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_4));
-		//printf("PHI 5 W MODEL : %d \n", valueOfVarInModel(ctx, model, Phi_5));
+		//printf("[DEBUG]:Model obtained for %s:\n", Z3_model_to_string(ctx, model));
 	}
-	//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_sub_formulas)); //[DEBUG]
+	//printf("[DEBUG]:AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_sub_formulas)); 
 	return And_sub_formulas;
 }
 
@@ -355,7 +325,6 @@ Z3_ast graphsToPathFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	Z3_ast t[2] = {x, notx};
 	if (pathLength < 1)
 	{
-		//printf("pathLength %d : %d  \n", pathLength, -1);
 		return Z3_mk_and(ctx, 2, t);
 	}
 
@@ -363,115 +332,12 @@ Z3_ast graphsToPathFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	for (int i = 0; i < numGraphs; i++)
 	{
 		Sub_Formulas_Concat[i] = Concat_sub_formulas(ctx, graphs, i, pathLength);
-		//check_satisfiable(ctx, Sub_Formulas_Concat[i] ,"Sub_formulas_concat",i);
-		//if (i != numGraphs - 1)
-			//printf("*********Graph %d done ***********Next graph : ********************\n", i);
 	}
-	Z3_ast Allgraph_formula = Z3_mk_and(ctx, numGraphs, Sub_Formulas_Concat);
-	
-	//printf("Allgraph_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Allgraph_formula)); //[DEBUG]
+	Z3_ast Allgraph_formula = Z3_mk_and(ctx, numGraphs, Sub_Formulas_Concat);	
+	//printf("[DEBUG]:Allgraph_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Allgraph_formula)); 
 	//check_satisfiable(ctx, Allgraph_formula ,"Check formula graph ",pathLength);
-	
 	return Allgraph_formula;
 }
-
-
-Z3_ast Upgrade(Z3_context ctx, Graph *graphs, unsigned int numGraphs, int minNodes)
-{
-	unsigned size_tab = minNodes+1; 
-	Z3_ast clause[size_tab];
-	int indice_clause = 0;
-	Z3_ast And_clause[size_tab];
-	int indice_And_clause = 0;
-	//Z3_ast End_clause[100000];
-	//int indice_End_clause = 0;
-	Z3_ast andand_clause[size_tab];
-	int indice_andand_clause = 0;
-	
-	Z3_ast t[size_tab];
-	int t_i = 0;
-	Z3_ast tt[size_tab];
-	int tt_i = 0;
-
-	Z3_ast And_graph[size_tab];
-	int and_g_i = 0;
-	
-	//for (int i = 0; i < numGraphs; i++)
-	//{
-		for(int k = 0 ; k < minNodes ; k++)
-		{
-			Z3_ast xsource = getNodeVariable(ctx, 0, 0 , k, 0);
-			for (int i = 0; i < numGraphs; i++)
-			{
-				for (int v = 0; v < graphs[i].numNodes; v++)
-				{
-					for (int j = 0; j <minNodes; j++)
-					{
-						for (int kk = 0; kk < minNodes; kk++)
-						{
-							if(kk!=k)
-							{
-								
-								Z3_ast xkk = getNodeVariable(ctx, i, j , kk, v);
-								Z3_ast negkk = Z3_mk_not(ctx, xkk);
-								clause[indice_clause] = negkk;
-								indice_clause++;
-							}
-						}
-						t[t_i]= Z3_mk_and(ctx, indice_clause, clause);
-						t_i++;
-						indice_clause =0;
-					}
-					tt[tt_i]= Z3_mk_and(ctx, t_i, t);
-					tt_i++;
-					t_i =0;
-				}
-				//And_clause[indice_And_clause] = Z3_mk_and(ctx, tt_i, tt);
-				//Z3_ast tab[2] = {xsource,And_clause[indice_And_clause]};
-				//andand_clause[indice_andand_clause] = Z3_mk_and(ctx,2,tab);
-				//indice_andand_clause++;
-				//tt_i=0;
-				And_graph[and_g_i] = Z3_mk_and(ctx, tt_i, tt);
-				and_g_i++;
-				tt_i=0;
-			}
-			And_clause[indice_And_clause] = Z3_mk_and(ctx, and_g_i, And_graph);
-			Z3_ast tab[2] = {xsource,And_clause[indice_And_clause]};
-			andand_clause[indice_andand_clause] = Z3_mk_and(ctx,2,tab);
-			indice_andand_clause++;
-			and_g_i=0;
-			
-		}
-		//End_clause[indice_End_clause] = Z3_mk_or(ctx, indice_andand_clause, andand_clause);
-		//indice_End_clause++;
-		//printf(" max: %d , clauses : %d \n",minNodes+1,indice_andand_clause);
-		return Z3_mk_or(ctx, indice_andand_clause, andand_clause);
-	}
-	//return Z3_mk_and(ctx,indice_End_clause,End_clause);
-	/*Z3_ast final = Z3_mk_and(ctx,indice_End_clause,End_clause);
-	Z3_ast sources[numGraphs];
-	int s_i = 0;
-	Z3_ast sources_k_i[minNodes];
-	int k_i= 0;
-	for(int k = 0; k<minNodes;k++)
-	{
-		for(int i = 0; i < numGraphs ;i++)
-		{
-			sources[s_i] = getNodeVariable(ctx, i, 0 , k, 0);
-			s_i++;
-		}
-		sources_k_i[k_i] =Z3_mk_and(ctx,s_i,sources);
-		k_i++;
-		s_i=0;
-	}
-	Z3_ast tabfinal[2] = {final,Z3_mk_or(ctx,k_i,sources_k_i)};
-	
-	return Z3_mk_and(ctx,2,tabfinal);*/
-//}
-
-
-
-
 
 int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs);
 /**
@@ -501,7 +367,6 @@ Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	Z3_ast Full_formula = Z3_mk_or(ctx, Min_numberNodesAllgraphs - 1, Formulas_for_k_lenght_Concat);
 	
 	/** AMELIORATION STEP 2 : We want only valuation of the found pathLength to be true */
-	//Voir pour améliorer --> trouver une formule qui dit que si y'a un chemin , tous les autres sommets doivent être faux
 	if(isFormulaSat(ctx, Full_formula) == Z3_L_TRUE) // I.e il y'a au moins 1 chemin, pas la peine de faire l'amélioration 2 si pas de chemin
 	{
 		Z3_model model = getModelFromSatFormula(ctx, Full_formula);
@@ -515,24 +380,22 @@ Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 					break;
 				}
 		}
-		//for(int length = Min_numberNodesAllgraphs; length>0 ; length--)
 		for(int length = 0; length<=Min_numberNodesAllgraphs ; length++)
 		{
 			Z3_ast variable = getNodeVariable(ctx, 0, 0,length,source);
-			if (valueOfVarInModel(ctx, model, variable) )//&& valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable))
+			if (valueOfVarInModel(ctx, model, variable))
 			{
 				if(isFormulaSat(ctx, graphsToPathFormula(ctx, graphs, numGraphs, length))==Z3_L_TRUE 
-				&& valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable)){
-
+				&& valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable))
+				{
 					length_solution = length;
 					break;
 				}
 			}
 		}
 		Z3_ast t[2] = {Full_formula,graphsToPathFormula(ctx, graphs, numGraphs, length_solution)};
-		//Z3_ast t[2] = {Full_formula,Upgrade(ctx,graphs,numGraphs,Min_numberNodesAllgraphs)};
 		Z3_ast Upgrade_formula = Z3_mk_and(ctx, 2, t); 
-		//printf("Full_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Full_formula)); //[DEBUG]
+		//printf("[DEBUG]:Full_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Full_formula)); 
 		//check_satisfiable(ctx, Full_formula, "FULL FORMULA", -1);
 		return Upgrade_formula;
 	}
@@ -556,7 +419,7 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs)
 	int source = 0;
 	for (int u = 0; u < graphs[0].numNodes; u++)
 		{
-			if (isSource(graphs[0], u)) // deplacer fprintf source ici
+			if (isSource(graphs[0], u)) 
 			{
 				source = u;
 				break;
@@ -568,7 +431,7 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs)
 
 		if (valueOfVarInModel(ctx, model, variable))
 		{
-			//printf("There is a simple valid path of length %d in all graphs  \n", j);
+			//printf("[DEBUG]:There is a simple valid path of length %d in all graphs  \n", j);
 			return pathLength;
 		}
 	}
@@ -593,19 +456,18 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
 	for (int counter = 0; counter < size_model; counter++)
 	{
 		Z3_func_decl f = Z3_model_get_const_decl(ctx, model, counter);
-		//printf("TEST 1 : %s", Z3_func_decl_to_string(ctx, f));
-		//printf("TEST 1 : %s", Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)));
-		//printf(" ICI Model obtained of len %d for %s:\n",i,Z3_model_to_string(ctx,model));
+		//printf("[DEBUG]:TEST 1 : %s", Z3_func_decl_to_string(ctx, f));
+		//printf("[DEBUG]:TEST 1 : %s", Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)));
+		//printf("[DEBUG]: ICI Model obtained of len %d for %s:\n",i,Z3_model_to_string(ctx,model));
 		if (strcmp(Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)), "true") == 0)
 		{
 			const char *tmp = Z3_func_decl_to_string(ctx, f);
 			sscanf(tmp, "(declare-fun |x%d,%d,%d,%d|%*s", &nbgraph[indice_trueVal], &pos[indice_trueVal], &path[indice_trueVal], &vertex[indice_trueVal]);
-			//printf("\nICI :|x%d,%d,%d,%d| , value = %s \n", nbgraph[indice_trueVal], pos[indice_trueVal], path[indice_trueVal], vertex[indice_trueVal], Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)));
+			//printf("[DEBUG]:\n:|x%d,%d,%d,%d| , value = %s \n", nbgraph[indice_trueVal], pos[indice_trueVal], path[indice_trueVal], vertex[indice_trueVal], Z3_ast_to_string(ctx, Z3_model_get_const_interp(ctx, model, f)));
 			indice_trueVal++;
 		}
 	}
-	//end for
-	
+
 	for (int i = 0; i < numGraph; i++)
 	{
 		printf("Path in graph %d \n", i);
@@ -655,17 +517,16 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 	if (file == NULL)
 	{
 		printf("Unable to create file.\n");
-		//exit(EXIT_FAILURE);
+
 	}
 	int source, target;
-	//PENSER A ITERAL SUR CHAQUE GRAPH
 	int numgraph_actual = 0;
 	fprintf(file, "digraph %s{\n", title_diagraph);
 	for (numgraph_actual = 0; numgraph_actual < numGraph; numgraph_actual++)
 	{
 		for (int u = 0; u < graphs[numgraph_actual].numNodes; u++)
 		{
-			if (isSource(graphs[numgraph_actual], u)) // deplacer fprintf source ici
+			if (isSource(graphs[numgraph_actual], u))
 			{
 				source = u;
 				char *source_str = getNodeName(graphs[numgraph_actual], source);
@@ -673,7 +534,7 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 				continue;
 			}
 
-			if (isTarget(graphs[numgraph_actual], u)) // deplacer fprintf target ici
+			if (isTarget(graphs[numgraph_actual], u))
 			{
 				target = u;
 				char *target_str = getNodeName(graphs[numgraph_actual], target);
@@ -700,7 +561,6 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 			}
 		}
 		int written = 0;
-		//Faire les arêtes + arêtes chemins
 		for (int u = 0; u < graphs[numgraph_actual].numNodes; u++)
 		{
 			for (int v = 0; v < graphs[numgraph_actual].numNodes; v++)
@@ -711,14 +571,16 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 					{
 						Z3_ast variable = getNodeVariable(ctx, numgraph_actual, position, pathLength, u);
 						Z3_ast variable2 = getNodeVariable(ctx, numgraph_actual, position2, pathLength, v);
-						if (isEdge(graphs[numgraph_actual], u, v) && valueOfVarInModel(ctx, model, variable) == true && valueOfVarInModel(ctx, model, variable2) == true && position2 == position + 1)
+						if (isEdge(graphs[numgraph_actual], u, v) && valueOfVarInModel(ctx, model, variable) == true
+						&& valueOfVarInModel(ctx, model, variable2) == true && position2 == position + 1)
 						{
 							char *u_str = getNodeName(graphs[numgraph_actual], u);
 							char *v_str = getNodeName(graphs[numgraph_actual], v);
 							fprintf(file, "_%d_%s -> _%d_%s [color=blue];\n", numgraph_actual, u_str, numgraph_actual, v_str);
 							written = 1;
 						}
-						else if (isEdge(graphs[numgraph_actual], u, v) && written == 0 && position2 == graphs[numgraph_actual].numNodes - 1 && position == graphs[numgraph_actual].numNodes - 1)
+						else if (isEdge(graphs[numgraph_actual], u, v) && written == 0 && position2 == graphs[numgraph_actual].numNodes - 1 
+						&& position == graphs[numgraph_actual].numNodes - 1)
 						{
 							char *u_str = getNodeName(graphs[numgraph_actual], u);
 							char *v_str = getNodeName(graphs[numgraph_actual], v);
@@ -732,6 +594,5 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 		}
 	}
 	fprintf(file, "}\n");
-
 	fclose(file);
 }

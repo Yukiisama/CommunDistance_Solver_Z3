@@ -6,6 +6,7 @@
 #include "Z3Tools.h"
 #include "Solving.h"
 #include <ctype.h>
+
 #include <unistd.h>
 int hflag = 0;
 int vflag = 0;
@@ -132,6 +133,7 @@ int main(int argc, char *argv[])
 	{
 		if(dflag==0)
 		{
+			
 			for (int i = 0; i <=Min_numberNodesAllgraphs; i++)
 			{	
 				
@@ -153,6 +155,7 @@ int main(int argc, char *argv[])
 					printf("No simple valid path of length %d in all graphs  \n", i);
 				}
 			}
+			
 		}
 		if(dflag==1)
 		{
@@ -179,6 +182,7 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
+
 	///***************************Clear Memory*************************************/
 	Z3_del_context(ctx);
 
