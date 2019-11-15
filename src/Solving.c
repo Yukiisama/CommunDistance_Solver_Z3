@@ -46,9 +46,10 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
 	//printf("BEGIN PHI 1 \n");
-	Z3_ast clause[100000];
+	unsigned max_size = graph.numNodes *graph.numNodes;
+	Z3_ast clause[max_size];
 	int indice_clause = 0;
-	Z3_ast And_clause[100000];
+	Z3_ast And_clause[max_size];
 	int indice_And_clause = 0;
 	for (int position = 0; position < pathLength; position++)
 	{ //j
@@ -75,9 +76,11 @@ Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph
 		And_clause[indice_And_clause] = Z3_mk_and(ctx, indice_clause, clause);
 		//printf("OR CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,Or_clause[indice_Or_clause])); //[DEBUG]
 		indice_And_clause++;
+
 		indice_clause = 0;
 	}
 	Z3_ast And_final_clause = Z3_mk_and(ctx, indice_And_clause, And_clause);
+				
 	//printf("AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause));
 	//printf("END PHI 1 \n");
 	return And_final_clause;
@@ -96,9 +99,10 @@ Z3_ast getIsPathFormula_PHI_1(Z3_context ctx, Graph graph, unsigned int numGraph
 Z3_ast getIsPathFormula_PHI_2(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
 	//printf("BEGIN PHI 2 \n");
-	Z3_ast clause[100000];
+	unsigned max_size = graph.numNodes*graph.numNodes;
+	Z3_ast clause[max_size];
 	int indice_clause = 0;
-	Z3_ast Or_clause[100000];
+	Z3_ast Or_clause[max_size];
 	int indice_Or_clause = 0;
 
 	for (int position = 0; position <= pathLength; position++)
@@ -110,7 +114,9 @@ Z3_ast getIsPathFormula_PHI_2(Z3_context ctx, Graph graph, unsigned int numGraph
 		}
 		Or_clause[indice_Or_clause] = Z3_mk_or(ctx, indice_clause, clause);
 		//printf("OR CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,Or_clause[indice_Or_clause])); //[DEBUG]
+		
 		indice_Or_clause++;
+		
 		indice_clause = 0;
 	}
 	Z3_ast And_clause = Z3_mk_and(ctx, indice_Or_clause, Or_clause);
@@ -131,10 +137,11 @@ Z3_ast getIsPathFormula_PHI_2(Z3_context ctx, Graph graph, unsigned int numGraph
 
 Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
+	unsigned max_size = graph.numNodes*graph.numNodes;
 	//printf("BEGIN PHI 3 \n");
-	Z3_ast clause[100000];
+	Z3_ast clause[max_size];
 	int indice_clause = 0;
-	Z3_ast And_clause[100000];
+	Z3_ast And_clause[max_size];
 	int indice_And_clause = 0;
 	for (int position = 0; position <= pathLength; position++)
 	{ //j
@@ -157,8 +164,10 @@ Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph, unsigned int numGraph
 		And_clause[indice_And_clause] = Z3_mk_and(ctx, indice_clause, clause);
 		//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause[indice_And_clause])); //[DEBUG]
 		indice_And_clause++;
+		
 		indice_clause = 0;
 	}
+		
 	Z3_ast And_final_clause = Z3_mk_and(ctx, indice_And_clause, And_clause);
 	//printf("AND FINAL CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_final_clause)); //[DEBUG]
 	//printf("END PHI 3 \n");
@@ -178,9 +187,10 @@ Z3_ast getIsPathFormula_PHI_3(Z3_context ctx, Graph graph, unsigned int numGraph
 Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph, unsigned int numGraph, int pathLength)
 {
 	//printf("BEGIN PHI 4 \n");
-	Z3_ast clause[100000];
+	unsigned max_size = graph.numNodes*(pathLength+1);
+	Z3_ast clause[max_size];
 	int indice_clause = 0;
-	Z3_ast And_clause[100000];
+	Z3_ast And_clause[max_size];
 	int indice_And_clause = 0;
 
 	for (int u = 0; u < graph.numNodes; u++)
@@ -203,6 +213,7 @@ Z3_ast getIsPathFormula_PHI_4(Z3_context ctx, Graph graph, unsigned int numGraph
 		}
 		And_clause[indice_And_clause] = Z3_mk_and(ctx, indice_clause, clause);
 		//printf("AND CLAUSE : \n  %s created.\n",Z3_ast_to_string(ctx,And_clause[indice_And_clause])); //[DEBUG]
+		//printf(" max: %d , clauses : %d \n",max_size,indice_clause);
 		indice_And_clause++;
 		indice_clause = 0;
 	}
