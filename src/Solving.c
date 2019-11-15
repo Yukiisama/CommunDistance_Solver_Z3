@@ -382,45 +382,61 @@ Z3_ast Upgrade(Z3_context ctx, Graph *graphs, unsigned int numGraphs, int minNod
 	int t_i = 0;
 	Z3_ast tt[100000];
 	int tt_i = 0;
+
+	Z3_ast And_graph[100000];
+	int and_g_i = 0;
 	
-	for (int i = 0; i < numGraphs; i++)
-	{
+	//for (int i = 0; i < numGraphs; i++)
+	//{
 		for(int k = 0 ; k < minNodes ; k++)
 		{
-			Z3_ast xsource = getNodeVariable(ctx, i, 0 , k, 0);
-			for (int v = 0; v < graphs[i].numNodes; v++)
+			Z3_ast xsource = getNodeVariable(ctx, 0, 0 , k, 0);
+			for (int i = 0; i < numGraphs; i++)
 			{
-				for (int j = 0; j <minNodes; j++)
+				for (int v = 0; v < graphs[i].numNodes; v++)
 				{
-					for (int kk = 0; kk < minNodes; kk++)
+					for (int j = 0; j <minNodes; j++)
 					{
-						if(kk!=k)
+						for (int kk = 0; kk < minNodes; kk++)
 						{
-							
-							Z3_ast xkk = getNodeVariable(ctx, i, j , kk, v);
-							Z3_ast negkk = Z3_mk_not(ctx, xkk);
-							clause[indice_clause] = negkk;
-							indice_clause++;
+							if(kk!=k)
+							{
+								
+								Z3_ast xkk = getNodeVariable(ctx, i, j , kk, v);
+								Z3_ast negkk = Z3_mk_not(ctx, xkk);
+								clause[indice_clause] = negkk;
+								indice_clause++;
+							}
 						}
+						t[t_i]= Z3_mk_and(ctx, indice_clause, clause);
+						t_i++;
+						indice_clause =0;
 					}
-					t[t_i]= Z3_mk_and(ctx, indice_clause, clause);
-					t_i++;
-					indice_clause =0;
+					tt[tt_i]= Z3_mk_and(ctx, t_i, t);
+					tt_i++;
+					t_i =0;
 				}
-				tt[tt_i]= Z3_mk_and(ctx, t_i, t);
-				tt_i++;
-				t_i =0;
+				//And_clause[indice_And_clause] = Z3_mk_and(ctx, tt_i, tt);
+				//Z3_ast tab[2] = {xsource,And_clause[indice_And_clause]};
+				//andand_clause[indice_andand_clause] = Z3_mk_and(ctx,2,tab);
+				//indice_andand_clause++;
+				//tt_i=0;
+				And_graph[and_g_i] = Z3_mk_and(ctx, tt_i, tt);
+				and_g_i++;
+				tt_i=0;
 			}
-			And_clause[indice_And_clause] = Z3_mk_and(ctx, tt_i, tt);
+			And_clause[indice_And_clause] = Z3_mk_and(ctx, and_g_i, And_graph);
 			Z3_ast tab[2] = {xsource,And_clause[indice_And_clause]};
 			andand_clause[indice_andand_clause] = Z3_mk_and(ctx,2,tab);
 			indice_andand_clause++;
-			tt_i=0;
+			and_g_i=0;
+			
 		}
-		End_clause[indice_End_clause] = Z3_mk_or(ctx, indice_andand_clause, andand_clause);
-		indice_End_clause++;
+		//End_clause[indice_End_clause] = Z3_mk_or(ctx, indice_andand_clause, andand_clause);
+		//indice_End_clause++;
+		return Z3_mk_or(ctx, indice_andand_clause, andand_clause);
 	}
-	return Z3_mk_and(ctx,indice_End_clause,End_clause);
+	//return Z3_mk_and(ctx,indice_End_clause,End_clause);
 	/*Z3_ast final = Z3_mk_and(ctx,indice_End_clause,End_clause);
 	Z3_ast sources[numGraphs];
 	int s_i = 0;
@@ -440,7 +456,8 @@ Z3_ast Upgrade(Z3_context ctx, Graph *graphs, unsigned int numGraphs, int minNod
 	Z3_ast tabfinal[2] = {final,Z3_mk_or(ctx,k_i,sources_k_i)};
 	
 	return Z3_mk_and(ctx,2,tabfinal);*/
-}
+//}
+
 
 
 
