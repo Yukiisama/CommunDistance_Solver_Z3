@@ -378,22 +378,22 @@ Z3_ast graphsToPathFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 
 Z3_ast Upgrade(Z3_context ctx, Graph *graphs, unsigned int numGraphs, int minNodes)
 {
-	
-	Z3_ast clause[minNodes+1];
+	unsigned size_tab = minNodes+1; 
+	Z3_ast clause[size_tab];
 	int indice_clause = 0;
-	Z3_ast And_clause[minNodes+1];
+	Z3_ast And_clause[size_tab];
 	int indice_And_clause = 0;
 	//Z3_ast End_clause[100000];
 	//int indice_End_clause = 0;
-	Z3_ast andand_clause[minNodes+1];
+	Z3_ast andand_clause[size_tab];
 	int indice_andand_clause = 0;
 	
-	Z3_ast t[minNodes+1];
+	Z3_ast t[size_tab];
 	int t_i = 0;
-	Z3_ast tt[minNodes+1];
+	Z3_ast tt[size_tab];
 	int tt_i = 0;
 
-	Z3_ast And_graph[minNodes+1];
+	Z3_ast And_graph[size_tab];
 	int and_g_i = 0;
 	
 	//for (int i = 0; i < numGraphs; i++)
@@ -504,7 +504,7 @@ Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 	//Voir pour améliorer --> trouver une formule qui dit que si y'a un chemin , tous les autres sommets doivent être faux
 	if(isFormulaSat(ctx, Full_formula) == Z3_L_TRUE) // I.e il y'a au moins 1 chemin, pas la peine de faire l'amélioration 2 si pas de chemin
 	{
-		/*Z3_model model = getModelFromSatFormula(ctx, Full_formula);
+		Z3_model model = getModelFromSatFormula(ctx, Full_formula);
 		int source = 0;
 		int length_solution = 0;
 		for (int u = 0; u < graphs[0].numNodes; u++)
@@ -515,20 +515,22 @@ Z3_ast graphsToFullFormula(Z3_context ctx, Graph *graphs, unsigned int numGraphs
 					break;
 				}
 		}
-		for(int length = Min_numberNodesAllgraphs; length>0 ; length--)
+		//for(int length = Min_numberNodesAllgraphs; length>0 ; length--)
+		for(int length = 0; length<=Min_numberNodesAllgraphs ; length++)
 		{
 			Z3_ast variable = getNodeVariable(ctx, 0, 0,length,source);
 			if (valueOfVarInModel(ctx, model, variable) )//&& valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable))
 			{
-				if(isFormulaSat(ctx, graphsToPathFormula(ctx, graphs, numGraphs, length))==Z3_L_TRUE && valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable)){
+				if(isFormulaSat(ctx, graphsToPathFormula(ctx, graphs, numGraphs, length))==Z3_L_TRUE 
+				&& valueOfVarInModel(ctx, getModelFromSatFormula(ctx,graphsToPathFormula(ctx, graphs, numGraphs, length)), variable)){
 
 					length_solution = length;
 					break;
 				}
 			}
-		}*/
-		//Z3_ast t[2] = {Full_formula,graphsToPathFormula(ctx, graphs, numGraphs, length_solution)};
-		Z3_ast t[2] = {Full_formula,Upgrade(ctx,graphs,numGraphs,Min_numberNodesAllgraphs)};
+		}
+		Z3_ast t[2] = {Full_formula,graphsToPathFormula(ctx, graphs, numGraphs, length_solution)};
+		//Z3_ast t[2] = {Full_formula,Upgrade(ctx,graphs,numGraphs,Min_numberNodesAllgraphs)};
 		Z3_ast Upgrade_formula = Z3_mk_and(ctx, 2, t); 
 		//printf("Full_formula : \n  %s created.\n",Z3_ast_to_string(ctx,Full_formula)); //[DEBUG]
 		//check_satisfiable(ctx, Full_formula, "FULL FORMULA", -1);
